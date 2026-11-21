@@ -422,7 +422,7 @@ function gOpen(gid){if(GCH)sb.removeChannel(GCH);GCH=sb.channel("g"+gid);
  .subscribe(s=>{if(s=="SUBSCRIBED"&&ONG?.role==2)GCH.send({type:"broadcast",event:"hi",payload:{}})})}
 const gSend=()=>GCH&&GCH.send({type:"broadcast",event:"st",payload:S.ck});
 const _rs=rest;rest=function(){const h=_rs();if(!window.ONLINE||GM)return h;
- const gi=GINV.filter(g=>Date.now()-g.gid<18e5).map(g=>`<div class="card" style="border-color:var(--a)"><div class="row"><div class="f1"><b>${E(PROF[g.from]?.name||"Друг")}</b><div class="m">зовёт в шашки</div></div><button class="s" data-p="gj" data-k="${g.gid}">Играть</button></div></div>`).join("");
+ const gi=GINV.filter(g=>Date.now()-g.gid<18e5).map(g=>`<div class="card" style="border-color:var(--a)"><div class="row"><div class="f1"><b>${E(PROF[g.from]?.name||"Друг")}</b><div class="m">зовёт в шашки</div></div><button class="s" data-p="gj" data-k="${g.gid}">Играть</button><button class="g s" data-p="gd" data-k="${g.gid}">✕</button></div></div>`).join("");
  const fr=S.friends.length?S.friends.map(f=>`<div class="row sp" style="margin-bottom:10px"><span class="row">${av(f,1,1)}${E(f.name)}</span><button class="s" data-p="gO" data-k="${f.id}">${ic("game",15)}Шашки</button></div>`).join(""):'<div class="m">Добавь друзей, чтобы играть вместе</div>';
  return gi+`<div class="card"><h3>${ic("users",16)} Играть с друзьями онлайн</h3>${fr}</div>`+h};
 document.addEventListener("click",e=>{if(!window.ONLINE)return;
@@ -463,7 +463,7 @@ const _ds=dkStep;dkStep=function(){_ds();if(!ONC?.host||!ONC.started)return;cons
  if(w>0&&g.ph=="t"&&g.table.length&&!g.pl[w].hand.some(c=>canT(g,c)))setTimeout(()=>{if(S.cg===g&&g.k===k&&!g.over&&g.who===w)dkPass(w)},900)};
 const _d3=draw;draw=function(){_d3();if(ONC?.host&&ONC.started)bcast()};
 const _on2=onNote;onNote=function(n){_on2(n);if(n.kind=="cards"&&n.data?.gid&&Date.now()-n.data.gid<18e5){CINV.unshift({gid:n.data.gid,from:n.data.from});nm(n.data.from).then(()=>{if(tab=="rest"&&!GM)draw()})}};
-function cardsOnline(){const h=CINV.filter(g=>Date.now()-g.gid<18e5&&!(ONC&&ONC.gid==g.gid)).map(g=>`<div class="card" style="border-color:var(--a)"><div class="row"><div class="f1"><b>${E(PROF[g.from]?.name||"Друг")}</b><div class="m">зовёт играть в дурака</div></div><button class="s" data-p="cj" data-k="${g.gid}">За стол</button></div></div>`).join("");
+function cardsOnline(){const h=CINV.filter(g=>Date.now()-g.gid<18e5&&!(ONC&&ONC.gid==g.gid)).map(g=>`<div class="card" style="border-color:var(--a)"><div class="row"><div class="f1"><b>${E(PROF[g.from]?.name||"Друг")}</b><div class="m">зовёт играть в дурака</div></div><button class="s" data-p="cj" data-k="${g.gid}">За стол</button><button class="g s" data-p="gd" data-k="${g.gid}">✕</button></div></div>`).join("");
  if(ONC){const st=ONC.started,hd=`<div class="card"><h3>${ic("cards",16)} Дурак онлайн</h3>`;
   if(st)return h+hd+`<div class="m">Партия идёт</div><div class="row" style="margin-top:10px"><button data-p="cb">К столу</button><button class="g" data-p="cl">${ONC.host?"Закончить":"Выйти"}</button></div></div>`;
   if(ONC.host)return h+hd+`<div class="m" style="margin-bottom:10px">Ждём друзей за столом:</div>${ONC.ids.map(id=>`<div class="row sp" style="margin-bottom:8px"><span class="row">${av(F(id),0,1)}${E(F(id).name)}</span><span class="m">${ONC.joined.has(id)?"за столом ✓":"думает…"}</span></div>`).join("")}<div class="row" style="margin-top:10px"><button data-p="cs" ${ONC.joined.size?"":"disabled"}>Раздать</button><button class="g" data-p="cl">Отмена</button></div></div>`;
@@ -504,4 +504,77 @@ document.addEventListener("click",async e=>{if(!window.ONLINE||!e.target.closest
  if(await Notification.requestPermission()!="granted")return toast("Разреши уведомления в настройках телефона");
  try{const reg=await navigator.serviceWorker.ready;let s=await reg.pushManager.getSubscription();if(!s)s=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)});
   const{error}=await sb.from("push_subs").upsert({endpoint:s.endpoint,user_id:UID,sub:s.toJSON()});if(error)return toast("Не вышло: "+error.message);SUBBED=true;toast("Уведомления на телефон включены 🔔")}catch(x){toast("Ошибка: "+x.message)}});
+
+/* ===== v6: новая лента, профиль друга, отмена игр, реакции ===== */
+document.head.insertAdjacentHTML("beforeend",`<style>
+@keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(100%)}}
+@keyframes fl{0%{transform:translate3d(0,0,0) scale(.5);opacity:0}15%{opacity:1}100%{transform:translate3d(var(--dx),-88vh,0) scale(1.25) rotate(28deg);opacity:0}}
+.hero{background:linear-gradient(135deg,color-mix(in srgb,var(--a) 38%,var(--c)),color-mix(in srgb,var(--b) 26%,var(--c)))}
+.sc{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px;margin:0 -4px}.sc::-webkit-scrollbar{display:none}.sc .chip{flex:none}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:16px;border-radius:22px;color:#fff;border:0;font-weight:700;font-size:15px;text-align:left}
+.str{display:flex;gap:16px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 12px}.str::-webkit-scrollbar{display:none}
+.sti{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;cursor:pointer;transition:transform .45s var(--bounce)}.sti:active{transform:scale(.9)}.sti small{font-size:11px;color:var(--m);max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rg{padding:3px;border-radius:26px;background:conic-gradient(from 200deg,hsl(var(--h),85%,62%),hsl(calc(var(--h) + 60),85%,60%),hsl(var(--h),85%,62%));position:relative}.rg>div{border:3px solid var(--c)}
+.rg i{position:absolute;right:-4px;bottom:-4px;width:22px;height:22px;border-radius:50%;background:var(--c);display:grid;place-items:center;border:2px solid var(--bg)}
+.fi{background:var(--c2);border-radius:20px;padding:12px;margin-bottom:10px;animation:rise .55s var(--sp) both}
+.fr{display:flex;align-items:center;gap:12px;padding:10px 4px;border-radius:16px;cursor:pointer;transition:background .25s,transform .4s var(--bounce)}.fr:active{transform:scale(.97);background:var(--c2)}
+.sheet{animation:up .5s var(--sp) both}.sh{width:44px;height:5px;border-radius:3px;background:#ffffff30;margin:-12px auto 18px}
+.rx{display:flex;gap:8px;justify-content:center}.rx button{font-size:26px;width:50px;height:50px;padding:0;border-radius:50%}
+.bdg{background:var(--r);color:#fff;border-radius:10px;font-size:12px;padding:2px 8px;margin-left:8px}
+</style>`);
+const mini=(f,z)=>`<div style="width:${z}px;height:${z}px;border-radius:${Math.round(z*.36)}px;flex:none;display:grid;place-items:center;font-weight:800;font-size:${Math.round(z*.42)}px;color:#fff;background:${f.avatar?`url(${f.avatar}) center/cover`:`linear-gradient(135deg,hsl(${f.color},80%,60%),hsl(${f.color+50},80%,55%))`}">${f.avatar?"":E((f.name||"?")[0].toUpperCase())}</div>`;
+const fire=(p,k)=>{const b=document.createElement("button");b.dataset.p=p;if(k)b.dataset.k=k;b.style.display="none";document.body.appendChild(b);b.click();b.remove()};
+function burst(em){const w=document.createElement("div");w.style.cssText="position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden";
+ for(let i=0;i<16;i++){const s=document.createElement("span");s.textContent=em;s.style.cssText=`position:absolute;left:${8+Math.random()*84}%;bottom:-50px;font-size:${28+Math.random()*30}px;--dx:${(Math.random()-.5)*140}px;animation:fl ${1.7+Math.random()}s ${Math.random()*.5}s cubic-bezier(.2,.7,.3,1) forwards`;w.appendChild(s)}
+ document.body.appendChild(w);setTimeout(()=>w.remove(),3500)}
+const fi=(who,t,s,b)=>`<div class="fi"><div class="row">${who}<div class="f1"><b>${t}</b><div class="m">${s}</div></div></div><div class="row" style="margin-top:10px;flex-wrap:wrap;gap:8px">${b}</div></div>`;
+const greet=()=>{const h=new Date().getHours();return h<5?"Доброй ночи":h<12?"Доброе утро":h<18?"Добрый день":"Добрый вечер"};
+home=function(){const m=S.me,sp=stats(),now=Date.now(),sm=ST[m.status]||ST.free;
+ const items=[
+  ...REQ.map(r=>fi(mini(r,46),E(r.name),"хочет дружить",`<button class="s" data-p="fa" data-k="${r.fid}">${ic("check",15)}Принять</button><button class="g s" data-p="fd" data-k="${r.fid}">Отклонить</button>`)),
+  ...S.invites.filter(i=>i.from!="me"&&!i.done&&now-i.ts<12e5).map(i=>fi(mini(F(i.from),46),E(F(i.from).name),KIND[i.kind][0]+" через 15 минут",Object.entries(ANS).map(([k,v],n)=>`<button class="s ${n?"g":""}" data-a="rep" data-i="${i.id}" data-k="${k}">${ic(v[1],15)}${v[0]}</button>`).join(""))),
+  ...GINV.filter(g=>now-g.gid<18e5).map(g=>fi(mini(PROF[g.from]||{name:"?",color:200},46),E(PROF[g.from]?.name||"Друг"),"зовёт в шашки",`<button class="s" data-p="gj" data-k="${g.gid}">Играть</button><button class="g s" data-p="gd" data-k="${g.gid}">Отказаться</button>`)),
+  ...CINV.filter(g=>now-g.gid<18e5&&!(ONC&&ONC.gid==g.gid)).map(g=>fi(mini(PROF[g.from]||{name:"?",color:200},46),E(PROF[g.from]?.name||"Друг"),"зовёт играть в дурака",`<button class="s" data-p="cj" data-k="${g.gid}">За стол</button><button class="g s" data-p="gd" data-k="${g.gid}">Отказаться</button>`))];
+ const my=S.invites.find(i=>i.from=="me"&&!i.done&&now-i.ts<9e5);
+ return`<div class="card hero"><div class="row" data-go="me" style="cursor:pointer">${mini(m,64)}<div class="f1"><div class="m">${greet()}</div><b style="font-size:22px;letter-spacing:-.5px">${E(m.name)}</b><div class="m" style="margin-top:2px">${E(m.txt)||sm[0]}</div></div></div>
+  <div class="m" style="margin:16px 0 8px">Чем занят сейчас?</div><div class="sc">${Object.entries(ST).map(([k,v])=>`<span class="chip ${m.status==k?"on":""}" data-a="st" data-k="${k}">${ic(v[2],16)}${v[0]}</span>`).join("")}</div></div>
+ <div class="card"><h3>${ic("bolt",16)} Что происходит${items.length?`<span class="bdg">${items.length}</span>`:""}</h3>${items.join("")||'<div class="m" style="text-align:center;padding:14px 0">Пока тихо 🌙<br>Позови кого-нибудь — кнопки ниже</div>'}</div>
+ <div class="card"><h3>${ic("flame",16)} Позвать на 15 минут</h3><div class="tiles">${Object.entries(KIND).map(([k,v],n)=>`<button class="tile" data-a="inv" data-k="${k}" style="background:linear-gradient(135deg,hsl(${(n*70+250)%360},75%,58%),hsl(${(n*70+290)%360},75%,46%))">${ic(v[1],26)}${v[0]}</button>`).join("")}</div>
+  ${my?`<div style="margin-top:16px"><div class="row sp"><span class="m">Ты позвал: <b>${KIND[my.kind][0]}</b></span><button class="g s" data-p="ic" data-i="${my.id}">Отменить</button></div>${S.friends.map(f=>`<div class="row sp" style="margin-top:8px"><span class="row">${mini(f,30)}${E(f.name)}</span><span class="m">${my.r[f.id]?ANS[my.r[f.id]][0]:"думает…"}</span></div>`).join("")}</div>`:""}</div>
+ <div class="card"><h3>${ic("users",16)} Друзья</h3>${S.friends.length?`<div class="str">${S.friends.map(f=>`<div class="sti" data-fr="${f.id}"><div class="rg" style="--h:${f.color}">${mini(f,52)}<i>${ic((ST[f.status]||ST.free)[2],12)}</i></div><small>${E(f.name)}</small></div>`).join("")}</div>
+  ${S.friends.map(f=>`<div class="fr" data-fr="${f.id}">${mini(f,44)}<div class="f1"><b>${E(f.name)}</b><div class="m">${E(f.txt)||(ST[f.status]||ST.free)[0]}</div></div><span class="m">${ic("plus",0)}›</span></div>`).join("")}`:'<div class="m" style="text-align:center;padding:10px 0 14px">Здесь пока никого.<br>Добавь друзей по коду или из списка</div>'}
+  <button class="g s" data-a="nf" style="margin-top:8px">${ic("plus",16)}Добавить друга</button></div>
+ <div class="card"><h3>${ic("flame",16)} Наша статистика</h3>${Object.entries(KIND).map(([k,v])=>`<div class="row sp" style="margin-bottom:8px"><span class="row">${ic(v[1],18)}${v[0]}</span><span class="m">собрались ${sp[k]?.ok||0} из ${sp[k]?.n||0}</span></div>`).join("")}</div>`};
+function openFriend(id){const f=S.friends.find(x=>x.id==id);if(!f)return;const st=ST[f.status]||ST.free,d=document.createElement("div");
+ d.style.cssText="position:fixed;inset:0;z-index:70;background:#0009;display:flex;align-items:flex-end;animation:fade .25s both";
+ d.innerHTML=`<div class="sheet card" style="width:100%;max-width:520px;margin:0 auto;border-radius:32px 32px 0 0;padding:26px 20px calc(24px + env(safe-area-inset-bottom,0px));text-align:center"><div class="sh"></div><div style="display:flex;justify-content:center;margin-bottom:12px">${mini(f,104)}</div><div style="font-size:26px;font-weight:800;letter-spacing:-.6px">${E(f.name)}</div><div class="chip on" style="display:inline-flex;margin:10px 0 6px">${ic(st[2],15)}${st[0]}</div><div class="m">${E(f.txt||"")}</div><div class="m" style="margin:20px 0 10px">Отправь реакцию</div><div class="rx">${["🔥","❤️","😂","👋","☕","🎉"].map(e=>`<button class="g" data-e="${e}">${e}</button>`).join("")}</div><div class="row" style="margin-top:18px"><button class="f1" data-x="chat">${ic("chat",16)}Написать</button><button class="f1 g" data-x="ck">${ic("game",16)}Шашки</button><button class="f1 g" data-x="cd">${ic("cards",16)}Дурак</button></div><button class="g s" data-x="del" style="margin-top:16px;color:var(--r)">Убрать из друзей</button></div>`;
+ document.body.appendChild(d);
+ d.onclick=async e=>{if(e.target==d)return d.remove();const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.e){burst(b.dataset.e);sb.from("notifications").insert({user_id:id,kind:"poke",data:{emoji:b.dataset.e,from:UID,text:S.me.name+" шлёт "+b.dataset.e}}).then(()=>{});toast("Отправлено "+b.dataset.e)}
+  const x=b.dataset.x;if(!x)return;d.remove();
+  if(x=="chat"){tab="fam";room=dm(id);draw()}
+  if(x=="ck"){tab="rest";fire("gO",id)}
+  if(x=="cd"){COSEL=new Set([id]);tab="rest";fire("cO")}
+  if(x=="del"&&confirm("Убрать "+f.name+" из друзей?")){await sb.from("friendships").delete().or(`and(from_id.eq.${UID},to_id.eq.${id}),and(from_id.eq.${id},to_id.eq.${UID})`);toast("Убрано из друзей");loadFriends()}}}
+function quitCk(){const o=ONG;if(GCH){GCH.send({type:"broadcast",event:"st",payload:{...S.ck,quit:1}});const c=GCH;GCH=null;setTimeout(()=>sb.removeChannel(c),600)}
+ if(o)sb.from("notifications").insert({user_id:o.peer,kind:"cancel",data:{gid:o.gid,text:S.me.name+" вышел(ла) из партии"}}).then(()=>{});ONG=null;S.ck=null}
+cClose=function(){const o=ONC;if(!o)return;ONC=null;if(S.cg&&S.cg.dur)S.cg=null;
+ if(o.host){o.ids.forEach(id=>csend(o.out[id],{t:"x"}));sb.from("notifications").insert(o.ids.map(id=>({user_id:id,kind:"cancel",data:{gid:o.gid,text:S.me.name+" закрыл(а) стол"}}))).then(()=>{})}else csend(o.toH,{t:"left",u:UID});
+ setTimeout(()=>[o.inC,o.toH,...Object.values(o.out||{})].forEach(c=>c&&sb.removeChannel(c)),700)};
+const _og=onGuestMsg;onGuestMsg=function(m){if(m.t=="x"&&ONC&&!ONC.host){const o=ONC;ONC=null;S.cg=null;GM=null;toast("Хозяин закрыл стол");setTimeout(()=>[o.inC,o.toH].forEach(c=>c&&sb.removeChannel(c)),400);draw();return}_og(m)};
+const _oh=onHostMsg;onHostMsg=function(m){if(m.t=="left"&&ONC?.host){ONC.joined.delete(m.u);toast(F(m.u).name+" вышел(ла) из-за стола");if(tab=="rest"&&!GM)draw();return}_oh(m)};
+const _on4=onNote;onNote=function(n){_on4(n);const d=n.data||{};
+ if(n.kind=="poke")burst(d.emoji||"👋");
+ if(n.kind=="cancel"){if(d.gid){GINV=GINV.filter(g=>g.gid!=d.gid);CINV=CINV.filter(g=>g.gid!=d.gid)}else S.invites.forEach(i=>{if(i.from==d.from)i.done=1});if(tab=="home"||tab=="rest")draw()}};
+const _d4=draw;draw=function(){if(ONG&&S.ck&&S.ck.quit){toast("Соперник вышел из партии");ONG=null;S.ck=null;if(GM=="ck")GM=null;if(GCH){sb.removeChannel(GCH);GCH=null}}
+ _d4();const q=$("#qb"),need=tab=="rest"&&GM&&(ONG||ONC);
+ if(need&&!q)document.body.insertAdjacentHTML("beforeend",'<button id="qb" data-p="qg" class="g s" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;z-index:30">✕ Выйти из игры</button>');else if(!need&&q)q.remove()};
+document.addEventListener("click",e=>{
+ const go=e.target.closest("[data-go=me]");if(go){document.querySelector("nav [data-t=me]")?.click();return}
+ const r=e.target.closest("[data-a=rep]");if(r){const i=S.invites.find(x=>x.id==+r.dataset.i);if(i){i.done=1;save();if(r.dataset.k=="ok")burst("🎉");draw()}return}
+ const x=e.target.closest("[data-fr]");if(x&&window.ONLINE){openFriend(x.dataset.fr);return}
+ const p=e.target.closest("[data-p]");if(!p||!window.ONLINE)return;const d=p.dataset;
+ if(d.p=="gd"){const g=GINV.find(y=>y.gid==d.k)||CINV.find(y=>y.gid==d.k);if(g)sb.from("notifications").insert({user_id:g.from,kind:"decline",data:{text:S.me.name+" не сможет сыграть",from:UID}}).then(()=>{});GINV=GINV.filter(y=>y.gid!=d.k);CINV=CINV.filter(y=>y.gid!=d.k);draw()}
+ if(d.p=="ic"){const i=S.invites.find(y=>y.id==+d.i);if(i){i.done=1;save();notifyFriends("cancel",S.me.name+" отменил(а) зов");toast("Зов отменён");draw()}}
+ if(d.p=="qg"){if(!confirm("Выйти из игры?"))return;if(GM=="ck"&&ONG)quitCk();else if(ONC)cClose();GM=null;draw();toast("Ты вышел из игры")}});
 </script></body></html>
