@@ -86,7 +86,7 @@ nav button.orb.on{animation:glow 2.4s ease-in-out infinite}
 nav button.orb:active{transform:scale(.88) rotate(-8deg)}
 @keyframes glow{50%{transform:translateY(-3px) scale(1.06)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body oncontextmenu="return false" oncopy="return false" oncut="return false" ondragstart="return false">
+</style><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0c0a1a"></head><body oncontextmenu="return false" oncopy="return false" oncut="return false" ondragstart="return false">
 <div id="splash"><div><svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:auto"><path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/></svg><h1>Свои</h1><div class="l"><i></i></div><div class="m" style="margin-top:14px;color:#fffa">Загружаем твою компанию…</div></div></div>
 <div id="top"><b>Свои</b><span id="net">онлайн</span></div><main id="v"></main><nav id="nv"></nav><div id="toast"></div>
 <script>
@@ -231,7 +231,7 @@ function cab(){const m=S.me,r=calcR(),c=r.c;
  return`<div class="card" style="text-align:center"><div class="av big" style="background:${m.avatar?`url(${m.avatar}) center/cover`:`linear-gradient(135deg,hsl(${m.color},80%,60%),hsl(${m.color+50},80%,55%))`}">${m.avatar?"":E((m.name||"?")[0].toUpperCase())}<label for="af">${ic("plus",18)}</label><input id="af" type="file" accept="image/*" hidden></div>
  <input class="nmi" data-p="name" value="${E(m.name)}" maxlength="20"><div class="m" style="margin-bottom:12px">${ST[m.status][0]}</div>
  <div class="chips" style="justify-content:center">${Object.entries(ST).map(([k,v])=>`<span class="chip ${m.status==k?"on":""}" data-a="st" data-k="${k}">${ic(v[2],16)}${v[0]}</span>`).join("")}</div>
- <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"><div class="m" style="margin-top:14px">${m.code?"Мой код для друзей: <b>"+E(m.code)+"</b>":""}</div><button class="g s" data-p="out" style="margin-top:10px">Выйти</button></div>
+ <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"><div class="m" style="margin-top:14px">${m.code?"Мой код для друзей: <b>"+E(m.code)+"</b>":""}</div><button class="s" data-p="pn" style="margin-top:14px;width:100%">🔔 Включить уведомления на телефон</button><button class="g s" data-p="out" style="margin-top:10px">Выйти</button></div>
  <div class="card"><h3>${ic("coin",16)} Калькулятор расходов</h3>
  <div class="chips" style="margin-bottom:12px">${CUR.map(x=>`<span class="chip ${c.cur==x?"on":""}" data-p="cur" data-k="${x}">${x}</span>`).join("")}</div>
  <div class="m">Зарплата</div><input data-p="sal" type="number" inputmode="decimal" placeholder="0" value="${c.sal||""}" style="margin:6px 0 12px;font-size:20px;font-weight:700">
@@ -488,4 +488,20 @@ document.addEventListener("click",e=>{if(!window.ONLINE)return;if(e.target.close
  if(d.p=="cs"&&ONC?.host){PICK=new Set([...ONC.joined]);ONC.started=true;ONC.sent={};GM="cards";dkNew();draw()}
  if(d.p=="cb"){GM="cards";draw()}
  if(d.p=="cl"){cClose();GM=null;draw()}});
+
+/* ===== v5: звук, системные уведомления, Web Push ===== */
+const VAPID="BEk3uJBsM53vrfZlOFPSBh37CREfdtQGp8cdUuvUDMFJkp39CsC2plbDG62QWxFdMfr2TvYv1idM45mxOMWRwDw";
+let AC,SUBBED=false,SWR=null;
+addEventListener("pointerdown",()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=="suspended")AC.resume()}catch(e){}});
+const ding=()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime;[[880,0],[1320,.13]].forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.25,t+d+.02);g.gain.exponentialRampToValueAtTime(.001,t+d+.5);o.connect(g);g.connect(AC.destination);o.start(t+d);o.stop(t+d+.55)});navigator.vibrate&&navigator.vibrate([60,40,60])}catch(e){}};
+if("serviceWorker" in navigator){SWR=navigator.serviceWorker.register("sw.js").then(()=>navigator.serviceWorker.ready).catch(()=>null);SWR.then(r=>r&&r.pushManager&&r.pushManager.getSubscription().then(s=>SUBBED=!!s))}
+const sysN=(t,b,tag)=>{if(document.hidden&&!SUBBED&&window.Notification&&Notification.permission=="granted"&&SWR)SWR.then(r=>r&&r.showNotification(t,{body:b,icon:"icon-192.png",tag}))};
+const _on3=onNote;onNote=function(n){_on3(n);ding();sysN("Свои",n.data?.text||"Новое уведомление","n")};
+const _om=onMsg;onMsg=async function(r){await _om(r);if(r.sender!=UID&&(!(tab=="fam"&&room==r.room)||document.hidden)){ding();sysN(PROF[r.sender]?.name||"Свои",r.body,"m")}};
+const u8=b=>{b=(b+"=".repeat((4-b.length%4)%4)).replace(/-/g,"+").replace(/_/g,"/");return Uint8Array.from(atob(b),c=>c.charCodeAt(0))};
+document.addEventListener("click",async e=>{if(!window.ONLINE||!e.target.closest("[data-p=pn]"))return;ding();
+ if(!("serviceWorker" in navigator)||!("PushManager" in window)||!window.Notification)return toast("На iPhone: Поделиться → «На экран Домой», открой «Свои» оттуда и нажми снова");
+ if(await Notification.requestPermission()!="granted")return toast("Разреши уведомления в настройках телефона");
+ try{const reg=await navigator.serviceWorker.ready;let s=await reg.pushManager.getSubscription();if(!s)s=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)});
+  const{error}=await sb.from("push_subs").upsert({endpoint:s.endpoint,user_id:UID,sub:s.toJSON()});if(error)return toast("Не вышло: "+error.message);SUBBED=true;toast("Уведомления на телефон включены 🔔")}catch(x){toast("Ошибка: "+x.message)}});
 </script></body></html>
