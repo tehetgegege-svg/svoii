@@ -1,0 +1,336 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#0e0b1a"><title>Свои</title>
+<style>
+:root{--bg:#0e0b1a;--c:#1a1630;--c2:#241f42;--t:#f3f0ff;--m:#8f8aae;--a:#8b6cff;--b:#ff5f9e;--ok:#34d399;--w:#fbbf24;--r:#fb7185;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);color-scheme:dark}
+@media(prefers-color-scheme:light){:root:not([data-theme=dark]){--bg:#f3f0ff;--c:#fff;--c2:#ebe6ff;--t:#1c1833;--m:#7a7498;color-scheme:light}}
+:root[data-theme=dark]{--bg:#0e0b1a;--c:#1a1630;--c2:#241f42;--t:#f3f0ff;--m:#8f8aae}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0}
+body{background:radial-gradient(120% 60% at 50% -10%,#3b2a7a55,transparent),var(--bg);color:var(--t);font:15px system-ui,-apple-system,"Segoe UI",sans-serif;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;display:flex;flex-direction:column;overflow:hidden}
+input{user-select:text;-webkit-user-select:text}@media print{body{display:none}}
+#top{display:flex;justify-content:space-between;align-items:center;padding:12px 18px}#top b{font-size:22px;letter-spacing:-.5px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;color:transparent}
+#net{font-size:11px;padding:4px 10px;border-radius:20px;background:#34d39922;color:var(--ok)}#net.off{background:#fbbf2422;color:var(--w)}
+main{flex:1;overflow-y:auto;padding:0 14px 100px}
+.card{background:var(--c);border-radius:22px;padding:16px;margin-bottom:14px;border:1px solid #ffffff0d}
+h3{margin:0 0 12px;font-size:13px;display:flex;gap:8px;align-items:center;color:var(--m);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sp{justify-content:space-between}.m{color:var(--m);font-size:13px}.f1{flex:1;min-width:0}
+button{font:inherit;border:0;border-radius:14px;padding:11px 16px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-weight:600;cursor:pointer;display:inline-flex;gap:7px;align-items:center;justify-content:center}button:active{transform:scale(.96)}
+button.g{background:var(--c2);color:var(--t)}button.s{padding:7px 11px;font-size:13px;border-radius:11px}button.on{background:var(--ok);color:#052}
+input{font:inherit;padding:12px 14px;border-radius:14px;border:1.5px solid #ffffff14;background:var(--c2);color:var(--t);min-width:0;width:100%}input:focus{outline:0;border-color:var(--a)}
+input[type=range]{padding:0;accent-color:var(--a);margin:6px 0 12px}
+.av{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-weight:800;font-size:19px;flex:none;color:#fff;position:relative}.av.sm{width:34px;height:34px;font-size:14px;border-radius:12px}
+.dot{position:absolute;right:-3px;bottom:-3px;width:14px;height:14px;border-radius:50%;border:3px solid var(--c)}
+.bar{height:12px;border-radius:8px;background:var(--c2);overflow:hidden;margin:6px 0 10px}.bar i{display:block;height:100%;border-radius:8px;transition:width .4s}
+.cells{display:flex;gap:6px;margin:6px 0}.cells b{flex:1;height:20px;border-radius:7px;background:var(--c2);cursor:pointer}.cells b.on{background:linear-gradient(90deg,var(--a),var(--b))}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:30px;background:var(--c2);font-size:14px;cursor:pointer}.chip.on{background:linear-gradient(135deg,var(--a),var(--b));color:#fff}
+.msg{padding:9px 13px;border-radius:18px 18px 18px 4px;background:var(--c2);margin:6px 0;max-width:82%;width:fit-content}.msg.me{background:linear-gradient(135deg,var(--a),var(--b));margin-left:auto;border-radius:18px 18px 4px 18px;color:#fff}.msg small{display:block;opacity:.7;font-size:11px}
+nav{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;background:#1a1630ee;backdrop-filter:blur(14px);padding:6px;border-radius:26px;border:1px solid #ffffff14;color:#f3f0ff}
+nav button{flex:1;flex-direction:column;gap:2px;background:none;color:#8f8aae;padding:8px 0;font-size:10px;border-radius:20px}nav button.on{background:#241f42;color:#fff}
+.chk{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;border-radius:16px;overflow:hidden;max-width:440px;margin:auto}.chk div{display:grid;place-items:center;position:relative}.chk .d{background:#4c3a8f}.chk .l{background:#d9d0ff}.chk .sel{box-shadow:inset 0 0 0 4px var(--ok)}.chk .tg:after{content:"";width:26%;aspect-ratio:1;border-radius:50%;background:var(--ok);opacity:.85;position:absolute}
+.pc{width:78%;aspect-ratio:1;border-radius:50%;box-shadow:0 3px 6px #0006,inset 0 -4px 0 #0004;display:grid;place-items:center;font-size:12px;font-style:normal;font-weight:800}.pc.w{background:radial-gradient(circle at 35% 30%,#fff,#cfc6ff);color:#333}.pc.k{background:radial-gradient(circle at 35% 30%,#666,#111);color:#fff}.pc.q{box-shadow:0 0 0 3px var(--w),0 3px 6px #0006}
+.cd{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:52px;height:76px;border-radius:11px;background:#fff;color:#1c1833;font-weight:800;font-size:18px;margin:3px;box-shadow:0 3px 8px #0005;line-height:1.1;position:relative;transition:transform .15s;animation:pop .25s}.cd.r{color:#e11d48}.cd.h:active{transform:translateY(-14px)}.cd.bk{background:repeating-linear-gradient(45deg,var(--a),var(--a) 5px,var(--b) 5px,var(--b) 10px);width:30px;height:44px;margin:2px -8px 2px 2px}.cd em{font-style:normal;font-size:10px;font-weight:600;position:absolute;bottom:-18px;color:#d1fae5;white-space:nowrap}
+@keyframes pop{from{transform:scale(.6) translateY(-20px);opacity:0}}
+.tbl{min-height:110px;background:radial-gradient(#0a7a5a,#065f46);border-radius:20px;padding:10px 10px 28px;display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 8px}
+.turn{box-shadow:0 0 0 2px var(--ok)}
+#toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-90px);background:var(--c2);color:var(--t);padding:11px 18px;border-radius:18px;box-shadow:0 8px 30px #0008;transition:.3s;z-index:50;font-size:14px;border:1px solid var(--a);max-width:90%}#toast.on{transform:translate(-50%,0)}
+#splash{position:fixed;inset:0;background:linear-gradient(160deg,#3b2a7a,#0e0b1a 60%,#7a2a55);display:grid;place-content:center;text-align:center;z-index:99;transition:opacity .5s;color:#fff}#splash h1{font-size:50px;margin:12px 0;animation:p 1.4s infinite alternate;letter-spacing:-2px}#splash .l{width:170px;height:5px;background:#fff2;border-radius:4px;margin:0 auto;overflow:hidden}#splash .l i{display:block;height:100%;width:40%;background:linear-gradient(90deg,var(--a),var(--b));animation:ld 1s infinite alternate ease-in-out}
+@keyframes p{to{transform:scale(1.07)}}@keyframes ld{to{margin-left:60%}}
+.dk{position:relative;height:calc(100dvh - 150px);min-height:620px;margin:0 -14px;border-radius:26px;overflow:hidden;background:radial-gradient(120% 90% at 50% 40%,#2f8a68,#1b5a45 70%,#143f32);box-shadow:inset 0 0 60px #0006;color:#fff}
+.pk{width:var(--w,58px);aspect-ratio:5/7;border-radius:7px;background:#fff;box-shadow:0 2px 7px #0008;display:inline-block;flex:none;position:relative}.pk svg{display:block;width:100%;height:100%;border-radius:7px}
+.pk.bk{background:conic-gradient(#e9e9f7 25%,#6a6fb8 0 50%,#e9e9f7 0 75%,#6a6fb8 0) 0 0/9px 9px;border:3px solid #fff}
+.op{position:absolute;display:flex;align-items:center;gap:8px;--w:30px}
+.op.t{top:8px;left:50%;transform:translateX(-50%);flex-direction:column}.op.l{left:8px;top:30%}.op.r{right:8px;top:30%;flex-direction:row-reverse}
+.op .fan{display:flex}.op .fan .pk{margin-left:-18px}.op .fan .pk:first-child{margin-left:0}
+.op.l .fan,.op.r .fan{flex-direction:column}.op.l .fan .pk,.op.r .fan .pk{margin-left:0;margin-top:-30px}.op.l .fan .pk:first-child,.op.r .fan .pk:first-child{margin-top:0}
+.nm{text-align:center;font-size:13px}.nm b{display:block;font-size:15px;min-height:18px}.nm b.r{color:#ff6b6b}.nm b.g{color:#7dff9b}.op.turn .nm span{color:#fde68a;text-shadow:0 0 8px #fbbf24}
+.dc{position:absolute;top:112px;left:50%;transform:translateX(-50%);--w:48px;display:flex;align-items:center}.dc .tc{position:absolute;left:26px;transform:rotate(90deg)}.dc>span,.tsu span{position:absolute;bottom:-20px;left:-20px;right:-20px;text-align:center;font-size:11px;opacity:.85;white-space:nowrap}.tsu{position:relative;display:grid;place-items:center}
+.tb{position:absolute;top:33%;left:50%;transform:translateX(-50%);width:84%;display:flex;flex-wrap:wrap;justify-content:center;gap:12px;--w:54px}
+.pr{position:relative;padding:0 16px 16px 0}.pr .df{position:absolute;left:16px;top:16px;transform:rotate(7deg)}.pr[data-dk]{cursor:pointer;animation:pl 1s infinite alternate}@keyframes pl{to{filter:brightness(1.25)}}
+.inf{position:absolute;left:0;right:0;bottom:188px;text-align:center;color:#d1fae5;font-size:13px;padding:0 14px}
+.act{position:absolute;left:0;right:0;bottom:142px;display:flex;justify-content:center}
+.hand{position:absolute;left:0;right:0;bottom:4px;display:flex;justify-content:center;padding:0 12px;--w:64px;height:132px;align-items:flex-end}
+.hand .pk{transform-origin:50% 130%;transition:margin .2s,filter .2s;cursor:pointer;filter:brightness(.78)}.hand .pk.ok{filter:none;box-shadow:0 0 0 2px #fde68a,0 3px 9px #000a}.hand .pk.sel{margin-bottom:24px;filter:none}
+.ov{position:absolute;inset:0;background:#000b;display:grid;place-items:center;z-index:5;text-align:center}.ov .card{margin:0;color:var(--t)}
+
+/* ===== polish v2 ===== */
+:root{--sp:cubic-bezier(.2,.9,.25,1);--bounce:cubic-bezier(.3,1.5,.5,1)}
+main{overscroll-behavior:contain;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.card{background:linear-gradient(160deg,color-mix(in srgb,var(--c) 92%,#fff 8%),var(--c));border:1px solid #ffffff12;box-shadow:0 10px 30px -14px #0007,inset 0 1px 0 #ffffff10;border-radius:26px}
+button,.chip{transition:transform .45s var(--bounce),filter .25s,background .3s,box-shadow .3s;will-change:transform}
+button:active,.chip:active{transform:scale(.93);transition-duration:.12s}
+button:not(.g):not(.on){box-shadow:0 6px 18px -6px color-mix(in srgb,var(--a) 70%,transparent)}
+nav{border-radius:30px;box-shadow:0 14px 40px -10px #000a}nav button{transition:background .4s var(--sp),color .3s,transform .45s var(--bounce)}nav button.on{transform:translateY(-1px)}nav button svg{transition:transform .5s var(--bounce)}nav button.on svg{transform:scale(1.18)}
+input{transition:border-color .25s,box-shadow .3s}input:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 25%,transparent)}
+@keyframes rise{from{opacity:0;transform:translate3d(0,26px,0) scale(.97)}to{opacity:1;transform:none}}
+main.enter>*{animation:rise .7s var(--sp) both}main.enter>:nth-child(2){animation-delay:.06s}main.enter>:nth-child(3){animation-delay:.12s}main.enter>:nth-child(4){animation-delay:.18s}main.enter>:nth-child(5){animation-delay:.24s}main.enter>:nth-child(n+6){animation-delay:.3s}
+#top b{font-size:24px}
+.big{width:104px;height:104px;border-radius:36px;font-size:42px;position:relative;margin:4px auto 14px;overflow:visible;box-shadow:0 18px 40px -12px color-mix(in srgb,var(--a) 80%,transparent);background-size:cover}
+.big label{position:absolute;right:-6px;bottom:-6px;width:36px;height:36px;border-radius:50%;background:var(--c);display:grid;place-items:center;border:3px solid var(--bg);cursor:pointer;color:var(--t);transition:transform .45s var(--bounce)}.big label:active{transform:scale(.85)}
+.nmi{background:none;border:0;text-align:center;font-size:24px;font-weight:800;letter-spacing:-.5px;padding:4px;box-shadow:none!important}
+.ring{position:relative;width:200px;height:200px;margin:6px auto 4px}.ring svg{width:100%;height:100%;transform:rotate(-90deg)}.ring circle{fill:none;stroke-width:9;stroke-linecap:round}.ring .bg{stroke:var(--c2)}.ring .pg{stroke:url(#rg);stroke-dasharray:326.7;transition:stroke-dashoffset 1.1s var(--sp)}
+.ring div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}.ring b{font-size:40px;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;line-height:1}.ring small{color:var(--m);font-size:12px;margin-top:6px}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.kpi div{background:var(--c2);border-radius:18px;padding:11px 8px;text-align:center}.kpi b{display:block;font-size:15px;font-variant-numeric:tabular-nums}.kpi small{color:var(--m);font-size:11px}
+.warn{max-height:0;opacity:0;overflow:hidden;transition:max-height .5s var(--sp),opacity .4s;color:var(--r);font-size:13px;text-align:center}.warn.on{max-height:60px;opacity:1;margin-top:10px}
+.it{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff0a;animation:rise .5s var(--sp) both}.it button{padding:4px 8px;border-radius:10px;background:none;color:var(--m);box-shadow:none!important}
+.lbl{display:flex;justify-content:space-between;font-size:14px;margin-top:6px}.lbl b{font-variant-numeric:tabular-nums}
+main{padding-bottom:120px}
+nav{left:14px;right:14px;height:66px;padding:6px;align-items:center;border-radius:34px;background:color-mix(in srgb,var(--c) 72%,transparent);backdrop-filter:blur(26px) saturate(1.7);-webkit-backdrop-filter:blur(26px) saturate(1.7);color:var(--t);border:1px solid #ffffff1a;z-index:20}
+nav .pill{position:absolute;top:6px;bottom:6px;left:0;width:0;border-radius:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 34%,transparent),color-mix(in srgb,var(--b) 22%,transparent));box-shadow:inset 0 0 0 1px #ffffff1c;transition:transform .65s var(--sp),width .65s var(--sp),opacity .35s;z-index:0;pointer-events:none}
+nav.o .pill{opacity:0}
+nav button{position:relative;z-index:1;height:54px;background:none;color:var(--m);font-size:10px;font-weight:600;gap:3px;padding:0;box-shadow:none!important}
+nav button.on{background:none;color:var(--t)}
+nav button .ico{display:grid;place-items:center;transition:transform .6s var(--bounce)}
+nav button.on .ico{transform:translateY(-1px) scale(1.15)}
+nav button.on .lb{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;color:transparent}
+nav button.orb{flex:none;width:66px;height:66px;margin:-30px 6px 0;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;box-shadow:0 14px 34px -6px color-mix(in srgb,var(--b) 75%,transparent),0 0 0 7px var(--bg)!important;transition:transform .55s var(--bounce)}
+nav button.orb .lb{display:none}
+nav button.orb.on{animation:glow 2.4s ease-in-out infinite}
+nav button.orb:active{transform:scale(.88) rotate(-8deg)}
+@keyframes glow{50%{transform:translateY(-3px) scale(1.06)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body oncontextmenu="return false" oncopy="return false" oncut="return false" ondragstart="return false">
+<div id="splash"><div><svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:auto"><path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/></svg><h1>Свои</h1><div class="l"><i></i></div><div class="m" style="margin-top:14px;color:#fffa">Загружаем твою компанию…</div></div></div>
+<div id="top"><b>Свои</b><span id="net">онлайн</span></div><main id="v"></main><nav id="nv"></nav><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),E=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])),rnd=a=>a[Math.random()*a.length|0];
+const I={home:"M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",bolt:"M13 2L4 14h7l-1 8 9-12h-7z",game:"M6 8h12a4 4 0 0 1 4 4v3a3 3 0 0 1-5.2 2L15 15H9l-1.8 2A3 3 0 0 1 2 15v-3a4 4 0 0 1 4-4zM8 10v4M6 12h4M16 11h.01M18 13h.01",chat:"M4 5h16v11H9l-5 4z",user:"M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",coffee:"M4 8h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 0 4h-2M7 2v3M11 2v3",walk:"M13 4h.01M10 21l2-6-3-3 2-5 3 3h3M9 12l-3 2",glass:"M7 3h10l-1 18H8zM7.5 9h9",smoke:"M3 15h14v4H3zM19 15v4M22 15v4M17 11c0-2 2-2 2-4",plus:"M12 5v14M5 12h14",minus:"M5 12h14",check:"M5 12l5 5 9-11",clock:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",x:"M6 6l12 12M18 6L6 18",send:"M3 11l18-8-8 18-2-8z",coin:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4",users:"M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2 20a7 7 0 0 1 14 0M17 5a3 3 0 0 1 0 6M18 14a6 6 0 0 1 4 6",lock:"M6 11h12v10H6zM8 11V8a4 4 0 0 1 8 0v3",flame:"M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-4 3-6 1 1 1 2 3 2-1-3-1-5 0-8z",cards:"M5 4h9a2 2 0 0 1 2 2v13H7a2 2 0 0 1-2-2zM18 7l2 .5-2.5 11",moon:"M20 14A8 8 0 0 1 10 4a8 8 0 1 0 10 10z",back:"M15 5l-7 7 7 7",pod:"M8 3h8v5H8zM7 8h10v13H7z",bot:"M5 8h14v11H5zM12 4v4M9 13h.01M15 13h.01"};
+const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${I[n]}"/></svg>`;
+const ST={free:["Свободен","#34d399","check"],busy:["Занят","#fb7185","x"],coffee:["Хочу кофе","#fbbf24","coffee"],walk:["Гуляю","#60a5fa","walk"],drink:["Выпиваю","#ff5f9e","glass"],sleep:["Сплю","#8f8aae","moon"]};
+const KIND={coffee:["Кофе","coffee"],walk:["Прогулка","walk"],drink:["Посидеть","glass"],smoke:["Перекур","smoke"]};
+const ANS={ok:["Ок, буду","check"],later:["Позже","clock"],busy:["Чуть занят","x"]};
+const SAY={ok:["Ок, через 15 мин там!","Погнали","Я за"],later:["Позже, ребят","Чуть позже подтянусь"],busy:["Чуть занят, сорри","Сейчас никак"]};
+const TALK=["Ну что, кто куда?","Я сегодня свободен","Го вечером","Ахах, жиза","Кто за кофе?","Я на подходе","Скинь фотку","Ладно, потом напишу","Вы видели прогноз?","Играем в карты?"];
+/* ====== СЛОЙ ДАННЫХ: сейчас localStorage. Позже заменим на Supabase ====== */
+const KEY="svoi_local_v1";
+const mkF=(id,name,color,status,txt,pod,iq)=>({id,name,color,status,txt,pod_pct:pod,iq_sticks:iq,show_pod:1,show_iq:1});
+let S={me:{name:"",color:260,status:"free",txt:"",pod_pct:80,pod_juice:60,iq_sticks:12,iq_bars:3,cig:10,show_pod:1,show_iq:1},
+ friends:[mkF("f1","Таня",330,"coffee","Хочу кофе",55,0),mkF("f2","Кирилл",200,"free","",40,8),mkF("f3","Макс",30,"drink","Где-то в баре",90,5),mkF("f4","Лера",150,"walk","Гуляю с собакой",70,3)],
+ money:[],invites:[],fams:[{id:"fam1",name:"Таня и Кирилл",members:["f1","f2"],status:"Вместе"}],msgs:{all:[{f:"f3",body:"Всем привет, это наша компания!",ts:1}]},cg:null,ck:null};
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x)S=x}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+/* ====== состояние интерфейса ====== */
+let tab="home",room="all",PICK=new Set(["f1","f2"]),SEL=null,NEWF=false,NEWFAM=new Set();
+const F=id=>id=="me"?{...S.me,id:"me"}:S.friends.find(f=>f.id==id)||{name:"?",color:200};
+const av=(p,s,sm)=>`<div class="av ${sm?"sm":""}" style="background:${p.avatar?`url(${p.avatar}) center/cover`:`linear-gradient(135deg,hsl(${p.color},80%,60%),hsl(${p.color+50},80%,55%))`}">${p.avatar?"":E((p.name||"?")[0].toUpperCase())}${s?`<i class="dot" style="background:${ST[p.status||"free"][1]}"></i>`:""}</div>`;
+const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2600)};
+const net=()=>{const n=$("#net");n.textContent=navigator.onLine?"онлайн":"нет сети";n.className=navigator.onLine?"":"off"};addEventListener("online",net);addEventListener("offline",net);
+/* ====== лента ====== */
+function stats(){const s={};S.invites.filter(i=>i.from=="me").forEach(i=>{const x=s[i.kind]=s[i.kind]||{n:0,ok:0};x.n++;if(Object.values(i.r).includes("ok"))x.ok++});return s}
+function sendInvite(kind){const inv={id:Date.now(),kind,from:"me",ts:Date.now(),r:{}};S.invites.unshift(inv);if(kind!="smoke"){S.me.status=kind}save();draw();
+ S.friends.forEach(f=>setTimeout(()=>{const a=Math.random()<.5?"ok":Math.random()<.5?"later":"busy";inv.r[f.id]=a;save();toast(f.name+": "+rnd(SAY[a]));if(tab=="home")draw()},1200+Math.random()*4500))}
+function home(){const m=S.me,sp=stats(),inv=S.invites.filter(i=>i.from!="me"&&Date.now()-i.ts<108e5);
+ return`<div class="card"><div class="row">${av(m,1)}<div class="f1"><b style="font-size:17px">${E(m.name)}</b><div class="m">${E(m.txt)||ST[m.status][0]}</div></div></div><div class="chips" style="margin-top:14px">${Object.entries(ST).map(([k,v])=>`<span class="chip ${m.status==k?"on":""}" data-a="st" data-k="${k}">${ic(v[2],16)}${v[0]}</span>`).join("")}</div></div>
+ <div class="card"><h3>${ic("bolt",16)} Позвать на 15 минут</h3><div class="row">${Object.entries(KIND).map(([k,v])=>`<button class="g" data-a="inv" data-k="${k}">${ic(v[1],18)}${v[0]}</button>`).join("")}</div>
+ ${S.invites.filter(i=>i.from=="me").slice(0,1).map(i=>`<div style="margin-top:14px"><div class="m">Твой последний зов: ${KIND[i.kind][0]}</div>${S.friends.map(f=>`<div class="row sp" style="margin-top:6px"><span class="row">${av(f,0,1)}${E(f.name)}</span><span class="m">${i.r[f.id]?ANS[i.r[f.id]][0]:"думает…"}</span></div>`).join("")}</div>`).join("")}</div>
+ ${inv.map(i=>`<div class="card" style="border-color:var(--a)"><div class="row">${av(F(i.from))}<div class="f1"><b>${E(F(i.from).name)}</b><div class="m">${KIND[i.kind][0]} через 15 мин</div></div></div><div class="row" style="margin-top:12px">${Object.entries(ANS).map(([k,v])=>`<button class="s ${i.r.me==k?"":"g"}" data-a="rep" data-i="${i.id}" data-k="${k}">${ic(v[1],15)}${v[0]}</button>`).join("")}</div></div>`).join("")}
+ <div class="card"><h3>${ic("users",16)} Друзья</h3>${S.friends.map(f=>`<div class="row" style="margin-bottom:14px">${av(f,1)}<div class="f1"><b>${E(f.name)}</b><div class="m">${E(f.txt)||ST[f.status][0]}</div>${f.show_pod?`<div class="bar" style="height:6px;margin:6px 0 0;max-width:140px"><i style="width:${f.pod_pct}%;background:var(--a)"></i></div><div class="m">под ${f.pod_pct}%${f.show_iq?` · стиков ${f.iq_sticks}`:""}</div>`:""}</div></div>`).join("")}
+ ${NEWF?`<div class="row"><input id="fc" placeholder="Имя друга" class="f1"><button data-a="addf">${ic("check",18)}</button></div>`:`<button class="g s" data-a="nf">${ic("plus",16)}Добавить друга</button>`}</div>
+ <div class="card"><h3>${ic("flame",16)} Наша статистика</h3>${Object.entries(KIND).map(([k,v])=>`<div class="row sp" style="margin-bottom:8px"><span class="row">${ic(v[1],18)}${v[0]}</span><span class="m">собрались ${sp[k]?.ok||0} из ${sp[k]?.n||0}</span></div>`).join("")}</div>`}
+/* ====== арсенал и деньги ====== */
+const tg=(k,t)=>`<button class="s ${S.me[k]?"on":"g"}" data-a="tg" data-k="${k}">${ic("users",15)}${t}: ${S.me[k]?"видят друзья":"скрыто"}</button>`;
+const stp=(k)=>`<span class="row"><button class="g s" data-a="n" data-k="${k}" data-d="-1">${ic("minus",14)}</button><b style="min-width:26px;text-align:center">${S.me[k]}</b><button class="g s" data-a="n" data-k="${k}" data-d="1">${ic("plus",14)}</button></span>`;
+function arsenal(){const m=S.me,bal=S.money.reduce((s,x)=>s+x.a,0);
+ return`<div class="card"><h3>${ic("pod",16)} Под-система</h3><div class="row sp"><span>Заряд</span><b>${m.pod_pct}%</b></div><div class="bar"><i style="width:${m.pod_pct}%;background:linear-gradient(90deg,var(--b),var(--a))"></i></div><input type="range" data-r="pod_pct" value="${m.pod_pct}">
+ <div class="row sp"><span>Жижа в картридже</span><b>${m.pod_juice}%</b></div><div class="bar"><i style="width:${m.pod_juice}%;background:var(--ok)"></i></div><input type="range" data-r="pod_juice" value="${m.pod_juice}">${tg("show_pod","Под")}</div>
+ <div class="card"><h3>${ic("flame",16)} IQOS</h3><div class="row sp"><span>Стиков</span>${stp("iq_sticks")}</div><div class="m" style="margin-top:12px">Зарядка</div><div class="cells">${[1,2,3,4].map(i=>`<b class="${i<=m.iq_bars?"on":""}" data-bar="${i}"></b>`).join("")}</div><div style="margin-top:6px">${tg("show_iq","Айкос")}</div></div>
+ <div class="card"><h3>${ic("smoke",16)} Сигареты</h3><div class="row sp"><span>В пачке</span>${stp("cig")}</div></div>
+ <div class="card"><h3>${ic("coin",16)} Мои деньги</h3><div class="m row">${ic("lock",14)} Видишь только ты</div><div style="font-size:32px;font-weight:800;margin:6px 0 12px">${bal.toLocaleString("ru")}</div><div class="row"><input id="ma" type="number" inputmode="decimal" placeholder="Сумма" style="width:110px"><input id="mn" placeholder="На что" class="f1"></div><div class="row" style="margin-top:10px"><button class="s" data-a="mn" data-s="1">${ic("plus",15)}Доход</button><button class="g s" data-a="mn" data-s="-1">${ic("minus",15)}Расход</button></div>${S.money.slice(0,8).map(x=>`<div class="row sp m" style="margin-top:8px"><span>${E(x.n)}</span><b style="color:${x.a<0?"var(--r)":"var(--ok)"}">${x.a}</b></div>`).join("")}</div>`}
+/* ====== карты ====== */
+const sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const cdh=(c,x="",n="")=>`<span class="cd ${/[♥♦]/.test(c)?"r":""} ${x}"><span>${c.slice(0,-1)}</span><span>${c.slice(-1)}&#xFE0E;</span>${n?`<em>${E(n)}</em>`:""}</span>`;
+function dealCards(){const dk=[];for(const s of"♠♥♦♣")for(const r of["6","7","8","9","10","J","Q","K","A"])dk.push(r+s);sh(dk);
+ const pl=[{id:"me",name:S.me.name},...S.friends.filter(f=>PICK.has(f.id)).map(f=>({id:f.id,name:f.name}))];pl.forEach(p=>p.hand=dk.splice(0,6));S.cg={pl,deck:dk,table:[],turn:0};save();botTurn()}
+function throwCard(pi,ci){const g=S.cg,p=g.pl[pi],c=p.hand.splice(ci,1)[0];g.table.push({by:p.name,id:p.id,c});g.turn=(pi+1)%g.pl.length;save();draw();botTurn()}
+function botTurn(){const g=S.cg;if(!g)return;const p=g.pl[g.turn];if(p.id=="me")return;setTimeout(()=>{if(S.cg!==g||g.pl[g.turn]!==p)return;if(!p.hand.length&&g.deck.length)p.hand.push(g.deck.shift());if(p.hand.length)throwCard(g.turn,Math.random()*p.hand.length|0);else{g.turn=(g.turn+1)%g.pl.length;save();draw();botTurn()}},1000+Math.random()*1200)}
+function cardsView(){const g=S.cg,me=g.pl[0];
+ return`<div class="row sp" style="margin-bottom:12px"><button class="g s" data-a="gx">${ic("back",16)}К играм</button><button class="g s" data-a="gn">Новая раздача</button></div>
+ <div class="card"><div class="row" style="margin-bottom:12px">${g.pl.map((p,i)=>`<div class="row ${g.turn==i?"turn":""}" style="padding:6px 10px;border-radius:14px;background:var(--c2)">${av(F(p.id),0,1)}<div><div style="font-size:13px;font-weight:600">${E(p.name)}</div><div class="m">${p.id=="me"?"твои карты ниже":p.hand.length+" карт"}</div></div></div>`).join("")}</div>
+ <h3>${ic("cards",16)} Общий стол</h3><div class="tbl">${g.table.map(t=>cdh(t.c,"",t.by)).join("")}</div>
+ <div class="row" style="margin-top:12px"><button class="g" data-a="draw">Взять карту (${g.deck.length})</button><button class="g" data-a="clr">Убрать со стола</button></div></div>
+ <div class="card ${g.turn==0?"turn":""}"><h3>${ic("lock",16)} Твои карты — ${g.turn==0?"твой ход":"ждём "+E(g.pl[g.turn].name)}</h3>${me.hand.map((c,i)=>`<span data-a="th" data-i="${i}">${cdh(c,"h")}</span>`).join("")||'<div class="m">Рука пуста — возьми карту из колоды</div>'}<div class="m" style="margin-top:6px">Нажми на карту, чтобы бросить её на стол</div></div>`}
+/* ====== шашки (белые — ты, чёрные — бот) ====== */
+const newCk=()=>{const b=Array(64).fill(0);for(let i=0;i<64;i++){const r=i>>3,c=i&7;if((r+c)%2){if(r<3)b[i]=2;if(r>4)b[i]=1}}return{b,t:1,cont:null,win:0}};
+function moves(b,t,only){const o=[],caps=[];for(let i=0;i<64;i++){const v=b[i];if(!v||v%2!=t%2||(only!=null&&i!=only))continue;const k=v>2,r=i>>3,c=i&7,dir=t==1?-1:1;
+ for(const dr of k?[-1,1]:[dir])for(const dc of[-1,1]){const r1=r+dr,c1=c+dc;if(r1<0||r1>7||c1<0||c1>7)continue;const j=r1*8+c1;
+  if(!b[j])o.push({f:i,t:j,x:-1});else if(b[j]%2!=t%2){const r2=r1+dr,c2=c1+dc;if(r2>=0&&r2<8&&c2>=0&&c2<8&&!b[r2*8+c2])caps.push({f:i,t:r2*8+c2,x:j})}}}
+ return caps.length?caps:(only!=null?[]:o)}
+function applyM(m){const g=S.ck,b=g.b,v=b[m.f];b[m.t]=v;b[m.f]=0;if(m.x>=0)b[m.x]=0;if(v==1&&m.t<8)b[m.t]=3;if(v==2&&m.t>55)b[m.t]=4;
+ if(m.x>=0&&b[m.t]==v&&moves(b,g.t,m.t).length){g.cont=m.t}else{g.cont=null;g.t=g.t==1?2:1;if(!moves(b,g.t).length)g.win=g.t==1?2:1}save()}
+function ckBot(){const g=S.ck;if(!g||g.win||g.t!=2)return;setTimeout(()=>{if(S.ck!==g||g.t!=2)return;const ms=moves(g.b,2,g.cont);if(!ms.length)return;const m=ms.find(x=>x.x>=0&&x.t>55)||rnd(ms.filter(x=>x.x>=0).length?ms.filter(x=>x.x>=0):ms);applyM(m);draw();ckBot()},700)}
+function ckCell(i){const g=S.ck;if(g.t!=1||g.win)return;const v=g.b[i];
+ if(v&&v%2==1&&g.cont==null){SEL=i;return draw()}
+ const m=SEL!=null&&moves(g.b,1,g.cont).find(x=>x.f==(g.cont??SEL)&&x.t==i);if(!m)return;SEL=null;applyM(m);if(g.cont!=null)SEL=g.cont;draw();ckBot()}
+function ckView(){const g=S.ck,tg=SEL!=null?moves(g.b,1,g.cont).filter(m=>m.f==(g.cont??SEL)).map(m=>m.t):[];
+ return`<div class="row sp" style="margin-bottom:12px"><button class="g s" data-a="gx">${ic("back",16)}К играм</button><button class="g s" data-a="ckn">Заново</button></div><div class="card"><div class="m" style="margin-bottom:10px">${g.win?`<b>Победили ${g.win==1?"ты":"чёрные (бот)"}</b>`:g.t==1?"Твой ход (белые)"+(g.cont!=null?" — бей дальше":""):"Думает бот…"}</div><div class="chk">${g.b.map((v,i)=>`<div data-s="${i}" class="${((i>>3)+(i&7))%2?"d":"l"} ${SEL===i?"sel":""} ${tg.includes(i)?"tg":""}">${v?`<i class="pc ${v%2?"w":"k"} ${v>2?"q":""}">${v>2?"К":""}</i>`:""}</div>`).join("")}</div><div class="m" style="margin-top:10px">Бить обязательно. Дамки ходят в любую сторону.</div></div>`}
+let GM=null;
+function rest(){if(GM=="cards"&&S.cg)return cardsView();if(GM=="ck"&&S.ck)return ckView();
+ return`<div class="card"><h3>${ic("cards",16)} Карты</h3><div class="m" style="margin-bottom:10px">С кем играем (у каждого свои 6 карт):</div><div class="chips">${S.friends.map(f=>`<span class="chip ${PICK.has(f.id)?"on":""}" data-a="pk" data-k="${f.id}">${E(f.name)}</span>`).join("")}</div><div class="row" style="margin-top:12px"><button data-a="gc">${ic("cards",18)}Раздать</button>${S.cg?`<button class="g" data-a="gcc">Продолжить</button>`:""}</div></div>
+ <div class="card"><h3>${ic("game",16)} Шашки против бота</h3><div class="row"><button data-a="gk">${ic("game",18)}Новая партия</button>${S.ck?`<button class="g" data-a="gkc">Продолжить</button>`:""}</div></div>`}
+/* ====== чаты ====== */
+function chat(){const f=S.fams.find(x=>x.id==room);
+ return`<div class="card"><div class="chips"><span class="chip ${room=="all"?"on":""}" data-a="sf" data-k="all">${ic("chat",16)}Общий</span>${S.fams.map(x=>`<span class="chip ${room==x.id?"on":""}" data-a="sf" data-k="${x.id}">${ic("users",16)}${E(x.name)}</span>`).join("")}<span class="chip" data-a="nfam">${ic("plus",16)}Семья</span></div>
+ ${f?`<div class="row" style="margin-top:12px">${f.members.map(i=>av(F(i),1,1)).join("")}<div class="f1"><div class="m">Статус семьи</div></div></div><div class="row" style="margin-top:8px"><input id="fs" placeholder="Вместе, на даче…" value="${E(f.status)}" class="f1"><button class="s" data-a="fst">${ic("check",16)}</button></div>`:""}
+ ${NEWFAM.size||NEWF=="fam"?`<div style="margin-top:12px"><input id="fn" placeholder="Название семьи"><div class="chips" style="margin:10px 0">${S.friends.map(x=>`<span class="chip ${NEWFAM.has(x.id)?"on":""}" data-a="fm" data-k="${x.id}">${E(x.name)}</span>`).join("")}</div><button class="s" data-a="mkf">Создать семью</button></div>`:""}</div>
+ <div class="card"><div id="ml" style="min-height:160px"></div><div class="row" style="margin-top:12px"><input id="mt" placeholder="Сообщение" class="f1"><button data-a="send">${ic("send",18)}</button></div></div>`}
+function updMsgs(){const el=$("#ml");if(!el)return;const ms=S.msgs[room]||[];el.innerHTML=ms.slice(-50).map(m=>`<div class="msg ${m.f=="me"?"me":""}"><small>${E(m.f=="me"?S.me.name:F(m.f).name)}</small>${E(m.body)}</div>`).join("")||'<div class="m">Пока тихо…</div>';$("#v").scrollTop=1e9}
+function botSay(r){const f=S.fams.find(x=>x.id==r),pool=f?f.members:S.friends.map(x=>x.id);setTimeout(()=>{(S.msgs[r]=S.msgs[r]||[]).push({f:rnd(pool),body:rnd(TALK),ts:Date.now()});save();if(tab=="fam"&&room==r)updMsgs();else toast("Новое сообщение")},1800+Math.random()*2500)}
+function prof(){return cab()}
+function welcome(){return`<div class="card" style="margin-top:30px"><h3>${ic("user",16)} Добро пожаловать</h3><input id="wn" placeholder="Как тебя зовут?"><div class="chips" style="margin:14px 0">${[260,330,200,30,150,90].map(h=>`<span class="av sm" data-a="wc" data-k="${h}" style="cursor:pointer;background:hsl(${h},80%,60%);outline:${S.me.color==h?"3px solid var(--t)":"0"}"></span>`).join("")}</div><button data-a="wg" style="width:100%">Поехали</button></div>`}
+/* ====== рендер ====== */
+function nav(){const T=[["home","home","Лента"],["arsenal","bolt","Арсенал"],["rest","game","Игры"],["fam","chat","Чаты"],["me","user","Я"]];$("#nv").innerHTML=S.me.name?T.map(t=>`<button data-t="${t[0]}" class="${tab==t[0]?"on":""}">${ic(t[1],22)}${t[2]}</button>`).join(""):""}
+function draw(){const a=document.activeElement,id=a&&a.tagName=="INPUT"?a.id:null,val=id?a.value:"",pos=id?a.selectionStart:0,sc=$("#v").scrollTop;nav();
+ $("#v").innerHTML=!S.me.name?welcome():({home,arsenal,rest,fam:chat,me:prof}[tab])();if(tab=="fam"&&S.me.name)updMsgs();$("#v").scrollTop=tab=="fam"?1e9:sc;
+ if(id&&$("#"+id)){const n=$("#"+id);if(n.type!="range"){n.value=val;n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}}
+const V=id=>$("#"+id)?.value.trim();
+document.addEventListener("click",e=>{
+ const t=e.target.closest("[data-t]");if(t){tab=t.dataset.t;draw();return}
+ const bar=e.target.closest("[data-bar]");if(bar){S.me.iq_bars=+bar.dataset.bar;save();draw();return}
+ const s=e.target.closest("[data-s]");if(s&&GM=="ck"){ckCell(+s.dataset.s);return}
+ const a=e.target.closest("[data-a]");if(!a)return;const d=a.dataset,m=S.me;
+ switch(d.a){
+ case"wc":m.color=+d.k;draw();$("#wn")&&0;return;
+ case"wg":{const n=V("wn");if(n.length<1)return;m.name=n;save();draw();setTimeout(()=>{const f=rnd(S.friends);S.invites.unshift({id:Date.now(),kind:"coffee",from:f.id,ts:Date.now(),r:{}});save();toast(f.name+" зовёт на кофе");if(tab=="home")draw()},12000);return}
+ case"st":m.status=d.k;m.txt=d.k=="coffee"?"Давайте через 15 минут на кофе":"";break;
+ case"sp":m.txt=V("pt");tab="home";break;
+ case"tg":m[d.k]=m[d.k]?0:1;break;
+ case"n":m[d.k]=Math.max(0,m[d.k]+ +d.d);break;
+ case"inv":sendInvite(d.k);return;
+ case"rep":{const i=S.invites.find(x=>x.id==+d.i);i.r.me=d.k;toast(d.k=="ok"?"Договорились":"Ответ отправлен");break}
+ case"nf":NEWF=true;break;
+ case"addf":{const n=V("fc");if(n){S.friends.push(mkF("f"+Date.now(),n,Math.random()*360|0,"free","",60+Math.random()*40|0,5));NEWF=false}break}
+ case"mn":{const n=+V("ma");if(n)S.money.unshift({a:n*d.s,n:V("mn")||(d.s>0?"Доход":"Расход")});break}
+ case"sf":room=d.k;break;
+ case"nfam":NEWF="fam";NEWFAM=new Set(NEWFAM);break;
+ case"fm":NEWFAM.has(d.k)?NEWFAM.delete(d.k):NEWFAM.add(d.k);break;
+ case"mkf":{const n=V("fn");if(n&&NEWFAM.size){const f={id:"fam"+Date.now(),name:n,members:[...NEWFAM],status:""};S.fams.push(f);room=f.id;NEWFAM.clear();NEWF=false}break}
+ case"fst":S.fams.find(x=>x.id==room).status=V("fs");toast("Статус семьи обновлён");break;
+ case"send":{const x=V("mt");if(!x)return;$("#mt").value="";(S.msgs[room]=S.msgs[room]||[]).push({f:"me",body:x,ts:Date.now()});save();updMsgs();if(Math.random()<.8)botSay(room);return}
+ case"pk":PICK.has(d.k)?PICK.delete(d.k):PICK.add(d.k);break;
+ case"gc":if(!PICK.size){toast("Выбери хотя бы одного друга");return}dealCards();GM="cards";break;
+ case"gcc":GM="cards";botTurn();break;
+ case"gn":dealCards();break;
+ case"gx":GM=null;SEL=null;break;
+ case"th":{const g=S.cg;if(g.turn!=0){toast("Сейчас ходит "+g.pl[g.turn].name);return}throwCard(0,+d.i);return}
+ case"draw":{const g=S.cg;if(g.deck.length){g.pl[0].hand.push(g.deck.shift());save()}break}
+ case"clr":S.cg.table=[];save();break;
+ case"gk":S.ck=newCk();GM="ck";SEL=null;break;
+ case"gkc":GM="ck";ckBot();break;
+ case"ckn":S.ck=newCk();SEL=null;break}
+ save();draw()});
+document.addEventListener("input",e=>{const k=e.target.dataset.r;if(k){S.me[k]=+e.target.value;save();clearTimeout(window._t);window._t=setTimeout(draw,250)}});
+document.addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.id=="mt")document.querySelector("[data-a=send]").click();if((e.ctrlKey||e.metaKey)&&"cxsup".includes(e.key.toLowerCase())&&e.target.tagName!="INPUT")e.preventDefault()});
+/* друзья живут своей жизнью */
+setInterval(()=>{if(!S.me.name)return;const f=rnd(S.friends),k=rnd(Object.keys(ST));f.status=k;f.txt=k=="coffee"?"Хочу кофе":"";f.pod_pct=Math.max(5,f.pod_pct-(Math.random()*8|0));if(tab=="home"&&!document.activeElement?.id)draw()},30000);
+net();draw();setTimeout(()=>{const s=$("#splash");s.style.opacity=0;setTimeout(()=>s.remove(),500)},1400);
+
+</script><script>
+/* ===== ЛИЧНЫЙ КАБИНЕТ + КАЛЬКУЛЯТОР РАСХОДОВ ===== */
+const CUR=["₴","₽","$","€"],PRE=["Аренда","Еда","Транспорт","Связь","Кредит"];
+const cc=()=>S.me.calc=S.me.calc||{sal:0,days:15,sv:10,cur:"₴",items:[]};
+const fm=n=>Math.round(n).toLocaleString("ru");
+function calcR(){const c=cc(),mand=c.items.reduce((s,x)=>s+x.a,0),free=c.sal-mand,sv=Math.max(0,free)*c.sv/100,sp=free-sv;return{c,mand,free,sv,sp,d:sp/Math.max(1,c.days)}}
+function cab(){const m=S.me,r=calcR(),c=r.c;
+ return`<div class="card" style="text-align:center"><div class="av big" style="background:${m.avatar?`url(${m.avatar}) center/cover`:`linear-gradient(135deg,hsl(${m.color},80%,60%),hsl(${m.color+50},80%,55%))`}">${m.avatar?"":E((m.name||"?")[0].toUpperCase())}<label for="af">${ic("plus",18)}</label><input id="af" type="file" accept="image/*" hidden></div>
+ <input class="nmi" data-p="name" value="${E(m.name)}" maxlength="20"><div class="m" style="margin-bottom:12px">${ST[m.status][0]}</div>
+ <div class="chips" style="justify-content:center">${Object.entries(ST).map(([k,v])=>`<span class="chip ${m.status==k?"on":""}" data-a="st" data-k="${k}">${ic(v[2],16)}${v[0]}</span>`).join("")}</div>
+ <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"></div>
+ <div class="card"><h3>${ic("coin",16)} Калькулятор расходов</h3>
+ <div class="chips" style="margin-bottom:12px">${CUR.map(x=>`<span class="chip ${c.cur==x?"on":""}" data-p="cur" data-k="${x}">${x}</span>`).join("")}</div>
+ <div class="m">Зарплата</div><input data-p="sal" type="number" inputmode="decimal" placeholder="0" value="${c.sal||""}" style="margin:6px 0 12px;font-size:20px;font-weight:700">
+ <div class="lbl"><span>Дней до следующей зарплаты</span><b id="dl">${c.days}</b></div><input type="range" data-p="days" min="1" max="31" value="${c.days}">
+ <div class="lbl"><span>Откладывать</span><b id="sl">${c.sv}%</b></div><input type="range" data-p="sv" min="0" max="50" step="5" value="${c.sv}"></div>
+ <div class="card"><h3>${ic("lock",16)} Обязательные траты</h3><div class="chips" style="margin-bottom:10px">${PRE.map(x=>`<span class="chip" data-p="pre" data-k="${x}">${x}</span>`).join("")}</div>
+ <div class="row"><input id="in" placeholder="Название" class="f1"><input id="ia" type="number" inputmode="decimal" placeholder="Сумма" style="width:100px"><button data-p="add">${ic("plus",18)}</button></div>
+ ${c.items.map((x,i)=>`<div class="it"><span>${E(x.n)}</span><span class="row"><b>${fm(x.a)} ${c.cur}</b><button data-p="del" data-k="${i}">${ic("x",14)}</button></span></div>`).join("")}</div>
+ <div class="card"><h3>${ic("flame",16)} Твой бюджет на день</h3><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#ff5f9e"/></linearGradient></defs><circle class="bg" cx="60" cy="60" r="52"/><circle class="pg" id="cr" cx="60" cy="60" r="52" style="stroke-dashoffset:326.7"/></svg><div><b id="cd" data-v="${r.d}">${fm(Math.max(0,r.d))}</b><small id="cu">${c.cur} в день</small></div></div>
+ <div class="warn" id="cw">Обязательные траты больше зарплаты — пора что-то менять</div>
+ <div class="kpi"><div><b id="k1">0</b><small>в неделю</small></div><div><b id="k2">0</b><small>отложим</small></div><div><b id="k3">0</b><small>обязательно</small></div></div></div>`}
+function tw(el,to){const from=+el.dataset.v||0,t0=performance.now();el.dataset.v=to;cancelAnimationFrame(el._r);const f=t=>{const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,4);el.textContent=fm(Math.max(0,from+(to-from)*e));if(k<1)el._r=requestAnimationFrame(f)};el._r=requestAnimationFrame(f)}
+function updCalc(){const e=$("#cd");if(!e)return;const r=calcR(),c=r.c,u=x=>fm(Math.max(0,x))+" "+c.cur;tw(e,Math.max(0,r.d));
+ $("#cu").textContent=c.cur+" в день";$("#k1").textContent=u(r.d*7);$("#k2").textContent=u(r.sv);$("#k3").textContent=u(r.mand);$("#dl").textContent=c.days;$("#sl").textContent=c.sv+"%";
+ $("#cr").style.strokeDashoffset=326.7*(1-(c.sal>0?Math.min(1,Math.max(0,r.sp/c.sal)):0));$("#cw").classList.toggle("on",r.free<0)}
+const _d=draw;draw=function(){_d();if(tab=="me"&&S.me.name)updCalc()};
+document.addEventListener("input",e=>{const p=e.target.dataset.p;if(!p)return;const c=cc(),v=e.target.value;
+ if(p=="sal")c.sal=+v||0;else if(p=="days")c.days=+v;else if(p=="sv")c.sv=+v;else if(p=="txt")S.me.txt=v;else if(p=="name"){S.me.name=v||S.me.name}else return;save();updCalc()});
+document.addEventListener("click",e=>{
+ const t=e.target.closest("[data-t]");if(t){const v=$("#v");v.classList.remove("enter");void v.offsetWidth;v.classList.add("enter");clearTimeout(v._e);v._e=setTimeout(()=>v.classList.remove("enter"),1100);if(t.dataset.t=="me"){const d=$("#cd");if(d){d.dataset.v=0;updCalc()}}return}
+ const x=e.target.closest("[data-p]");if(!x)return;const d=x.dataset,c=cc();
+ if(d.p=="cur"){c.cur=d.k;save();draw()}
+ if(d.p=="pre"){$("#in").value=d.k;$("#ia").focus()}
+ if(d.p=="add"){const n=V("in"),a=+V("ia");if(!a){toast("Введи сумму");return}c.items.push({n:n||"Расход",a});save();draw()}
+ if(d.p=="del"){c.items.splice(+d.k,1);save();draw()}});
+document.addEventListener("change",e=>{if(e.target.id!="af"||!e.target.files[0])return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement("canvas"),n=256,z=Math.min(im.width,im.height);c.width=c.height=n;c.getContext("2d").drawImage(im,(im.width-z)/2,(im.height-z)/2,z,z,0,0,n,n);S.me.avatar=c.toDataURL("image/jpeg",.85);save();draw();toast("Аватар обновлён")};im.src=r.result};r.readAsDataURL(e.target.files[0])});
+nav=function(){const nv=$("#nv");if(!S.me.name){nv.innerHTML="";return}
+ const T=[["home","home","Лента"],["arsenal","bolt","Арсенал"],["rest","game","Игры"],["fam","chat","Чаты"],["me","user","Я"]];
+ if(!nv.querySelector(".pill"))nv.innerHTML='<i class="pill"></i>'+T.map(t=>`<button data-t="${t[0]}" class="${t[0]=="rest"?"orb":""}"><span class="ico">${ic(t[1],t[0]=="rest"?28:22)}</span><span class="lb">${t[2]}</span></button>`).join("");
+ const bs=[...nv.querySelectorAll("button")],i=T.findIndex(t=>t[0]==tab),b=bs[i],p=nv.querySelector(".pill");
+ bs.forEach((x,k)=>x.classList.toggle("on",k==i));nv.classList.toggle("o",tab=="rest");
+ if(b&&tab!="rest"){p.style.width=b.offsetWidth+"px";p.style.transform=`translateX(${b.offsetLeft}px)`}};
+addEventListener("resize",()=>nav());nav();
+document.getElementById("v").classList.add("enter");setTimeout(()=>$("#v").classList.remove("enter"),1100);
+/* ===== ДУРАК (подкидной) ===== */
+document.body.insertAdjacentHTML("afterbegin",`<svg width="0" height="0" style="position:absolute"><defs><symbol id="sS" viewBox="0 0 24 24"><path d="M12 2c4 5 8 7 8 11a4 4 0 0 1-7 2.5c.3 2 1 4 2 6H9c1-2 1.7-4 2-6A4 4 0 0 1 4 13c0-4 4-6 8-11z"/></symbol><symbol id="sH" viewBox="0 0 24 24"><path d="M12 21.5C5 16 2 12.5 2 8.5A5 5 0 0 1 12 6a5 5 0 0 1 10 2.5c0 4-3 7.5-10 13z"/></symbol><symbol id="sD" viewBox="0 0 24 24"><path d="M12 1.5l8 10.5-8 10.5-8-10.5z"/></symbol><symbol id="sC" viewBox="0 0 24 24"><path d="M12 2a4.2 4.2 0 0 0-3.6 6.3 4.2 4.2 0 1 0 2.6 7c0 2-.6 4-1.6 6.2h5.2c-1-2.2-1.6-4.2-1.6-6.2a4.2 4.2 0 1 0 2.6-7A4.2 4.2 0 0 0 12 2z"/></symbol><linearGradient id="gf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c9"/><stop offset="1" stop-color="#f0bf4c"/></linearGradient></defs></svg>`);
+const SY={"♠":"sS","♥":"sH","♦":"sD","♣":"sC"},RK=["6","7","8","9","10","J","Q","K","A"],rv=c=>RK.indexOf(c.slice(0,-1)),su=c=>c.slice(-1),CC={};
+function csv(c){if(CC[c])return CC[c];const s=su(c),r=c.slice(0,-1),u="#"+SY[s],col=(s=="♥"||s=="♦")?"#d32f2f":"#1b1b1f";
+ const cor=`<text x="${r=="10"?3:7}" y="21" font-size="${r=="10"?17:20}" font-weight="700" fill="${col}" font-family="Georgia,serif">${r}</text><use href="${u}" x="7" y="24" width="15" height="15" fill="${col}"/>`;
+ const L=32,R=68,C=50,P={6:[[L,38],[R,38],[L,70],[R,70],[L,102],[R,102]]};P[7]=[...P[6],[C,54]];P[8]=[...P[7],[C,86]];
+ P[9]=[[L,34],[R,34],[L,58],[R,58],[L,82],[R,82],[L,106],[R,106],[C,70]];P[10]=[[L,34],[R,34],[L,58],[R,58],[L,82],[R,82],[L,106],[R,106],[C,46],[C,94]];
+ let mid="";
+ if(r=="A")mid=`<use href="${u}" x="26" y="46" width="48" height="48" fill="${col}"/>`;
+ else if(P[r])mid=P[r].map(([x,y])=>`<use href="${u}" x="${x-10}" y="${y-10}" width="20" height="20" fill="${col}"${y>70?` transform="rotate(180 ${x} ${y})"`:""}/>`).join("");
+ else{const h=`<path d="M34 70Q36 56 50 56Q64 56 66 70z" fill="${col}"/><circle cx="50" cy="48" r="7" fill="#f6d2a8" stroke="${col}"/>${r=="J"?`<path d="M41 44Q50 34 59 44z" fill="${col}"/>`:`<path d="M41 43l2-11 7 6 7-6 2 11z" fill="#f2b705" stroke="${col}"/>`}<use href="${u}" x="25" y="28" width="12" height="12" fill="${col}"/>`;
+  mid=`<rect x="19" y="24" width="62" height="92" rx="5" fill="url(#gf)" stroke="${col}" stroke-width="1.5"/><path d="M19 70H81" stroke="${col}" opacity=".5"/>${h}<g transform="rotate(180 50 70)">${h}</g>`}
+ return CC[c]=`<svg viewBox="0 0 100 140"><rect width="100" height="140" rx="9" fill="#fff"/>${mid}${cor}<g transform="rotate(180 50 70)">${cor}</g></svg>`}
+const pk=(c,x="",a="")=>`<div class="pk ${x}" ${a}>${csv(c)}</div>`;
+const dkNx=(g,i)=>{const n=g.pl.length;for(let k=1;k<=n;k++){const j=(i+k)%n;if(g.pl[j].hand.length||g.deck.length)return j}return i};
+const dkDef=g=>dkNx(g,g.att);
+const dkT=g=>{const d=dkDef(g),n=g.pl.length,o=[];for(let k=0;k<n;k++){const j=(g.att+k)%n;if(j!=d&&(g.pl[j].hand.length||g.deck.length))o.push(j)}return o};
+const canT=(g,c)=>!g.table.length||(g.table.length<g.lim&&g.table.some(t=>rv(t.a)==rv(c)||(t.d&&rv(t.d)==rv(c))));
+const beats=(g,a,d)=>su(d)==su(a)?rv(d)>rv(a):su(d)==g.trump;
+function dkNew(){const fr=S.friends.filter(f=>PICK.has(f.id)).slice(0,3),dk=[];for(const s of"♠♥♦♣")for(const r of RK)dk.push(r+s);sh(dk);
+ const pl=[{id:"me",name:S.me.name,hand:[]},...fr.map(f=>({id:f.id,name:f.name,hand:[]}))];pl.forEach(p=>p.hand=dk.splice(0,6));
+ const tc=dk[dk.length-1],ts=su(tc);let a=0,best=99;pl.forEach((p,i)=>p.hand.forEach(c=>{if(su(c)==ts&&rv(c)<best){best=rv(c);a=i}}));
+ const g={dur:1,pl,deck:dk,trump:ts,tc,att:a,table:[],ph:"t",ti:0,pass:[],taking:false,lim:6,st:{},sel:null,over:null,who:a,k:0};g.lim=Math.min(6,pl[dkDef(g)].hand.length);S.cg=g;save();setTimeout(dkStep,300)}
+function dealCards(){if(PICK.size>3)toast("За столом до 4 человек — беру первых троих");dkNew()}
+function botTurn(){dkStep()}
+function dkStep(){const g=S.cg;if(!g||!g.dur||g.over)return;const T=dkT(g);if(g.ph=="t"&&(g.ti<0||g.ti>=T.length))g.ti=0;
+ g.who=g.ph=="d"?dkDef(g):T[g.ti];save();const k=g.k=(g.k||0)+1;draw();
+ if(g.who==0){if(g.ph=="t"&&g.table.length&&!g.pl[0].hand.some(c=>canT(g,c)))setTimeout(()=>{if(S.cg===g&&g.k===k&&!g.over)dkPass(0)},700);return}
+ setTimeout(()=>{if(S.cg===g&&g.k===k&&!g.over)dkBot()},900+Math.random()*900)}
+function dkThrow(i,c){const g=S.cg,p=g.pl[i];p.hand.splice(p.hand.indexOf(c),1);g.table.push({a:c,d:null});g.pass=[];g.st=g.taking?{[g.pl[dkDef(g)].id]:"Беру"}:{};g.ti=0;if(!g.taking)g.ph="d";dkStep()}
+function dkBeat(t,c){const g=S.cg,p=g.pl[dkDef(g)];p.hand.splice(p.hand.indexOf(c),1);t.d=c;g.sel=null;g.st={};
+ if(g.table.every(x=>x.d)){if(!p.hand.length||g.table.length>=g.lim)return dkEnd(false);g.ph="t";g.ti=0;g.pass=[]}dkStep()}
+function dkPass(i){const g=S.cg;g.pass.push(i);g.st[g.pl[i].id]="Пас";g.ti=dkT(g).findIndex(x=>!g.pass.includes(x));if(g.ti<0)return dkEnd(g.taking);dkStep()}
+function dkTake(){const g=S.cg;g.taking=true;g.st={[g.pl[dkDef(g)].id]:"Беру"};g.ph="t";g.ti=0;g.pass=[];g.sel=null;dkStep()}
+function dkEnd(took){const g=S.cg,d=dkDef(g),ord=[...dkT(g),d];
+ if(took)g.pl[d].hand.push(...g.table.flatMap(t=>t.d?[t.a,t.d]:[t.a]));
+ g.table=[];ord.forEach(i=>{const p=g.pl[i];while(p.hand.length<6&&g.deck.length)p.hand.push(g.deck.shift())});
+ const live=g.pl.filter(p=>p.hand.length);
+ if(!g.deck.length&&live.length<=1){g.over=!live.length?"Ничья":live[0].id=="me"?"Ты остался дураком":live[0].name+" остался дураком";g.st={};save();draw();return}
+ g.att=took?dkNx(g,d):(g.pl[d].hand.length?d:dkNx(g,d));g.ph="t";g.ti=0;g.pass=[];g.taking=false;g.sel=null;g.st={};g.lim=Math.min(6,g.pl[dkDef(g)].hand.length);
+ toast(took?g.pl[d].name+" берёт":"Бито");dkStep()}
+function dkBot(){const g=S.cg,i=g.who,p=g.pl[i],lo=(a,b)=>(su(a)==g.trump)-(su(b)==g.trump)||rv(a)-rv(b);
+ if(g.ph=="d"){const t=g.table.find(x=>!x.d),o=p.hand.filter(c=>beats(g,t.a,c)).sort(lo);if(o.length&&Math.random()>.07)dkBeat(t,o[0]);else dkTake();return}
+ const first=!g.table.length,o=p.hand.filter(c=>canT(g,c)).sort(lo);
+ if(o.length&&(first||su(o[0])!=g.trump||(!g.deck.length&&Math.random()<.6))&&(first||g.taking||Math.random()<.9))dkThrow(i,o[0]);else dkPass(i)}
+const POS={2:["b","t"],3:["b","l","r"],4:["b","l","t","r"]};
+function cardsView(){const g=S.cg;if(!g||!g.dur){dkNew();return""}
+ const pos=POS[g.pl.length]||POS[4],me=g.pl[0],d=dkDef(g),open=g.table.filter(t=>!t.d),mt=g.who==0&&!g.over;
+ const op=g.pl.map((p,i)=>i?`<div class="op ${pos[i]} ${g.who==i?"turn":""}"><div class="fan">${p.hand.slice(0,10).map(()=>'<i class="pk bk"></i>').join("")}</div><div class="nm"><span>${E(p.name)} · ${p.hand.length}</span><b class="${g.st[p.id]=="Беру"?"r":"g"}">${g.st[p.id]||(i==g.att?"Ходит":i==d?"Защита":"")}</b></div></div>`:"").join("");
+ const h=me.hand,N=h.length,mid=(N-1)/2,stp=Math.min(7,60/Math.max(N,1));
+ const lg=g.ph=="t"&&mt?c=>canT(g,c):g.ph=="d"&&mt?c=>open.some(t=>beats(g,t.a,c)):()=>false;
+ const hand=h.map((c,i)=>pk(c,(lg(c)?"ok ":"")+(g.sel==c?"sel":""),`data-dk="h" data-c="${c}" style="transform:rotate(${((i-mid)*stp).toFixed(1)}deg) translateY(${(Math.abs(i-mid)**2*(N>8?1.6:2.4)).toFixed(1)}px);margin-left:${i?(N>11?-42:N>8?-34:-22):0}px;z-index:${i}"`)).join("");
+ const tb=g.table.map((t,i)=>`<div class="pr" ${!t.d&&mt&&g.ph=="d"?`data-dk="t" data-i="${i}"`:""}>${pk(t.a)}${t.d?pk(t.d,"df"):""}</div>`).join("");
+ const red=g.trump=="♥"||g.trump=="♦";
+ const dc=`<div class="dc">${g.deck.length?`<div class="tc">${pk(g.tc)}</div><i class="pk bk"></i><span>${g.deck.length} в колоде</span>`:`<div class="tsu"><svg width="38" height="38" fill="${red?"#ff6b6b":"#fff"}"><use href="#${SY[g.trump]}"/></svg><span>козырь</span></div>`}</div>`;
+ const lbl=dkT(g)[0]==0?"Бито":"Пас";
+ const btn=mt&&g.ph=="t"&&g.table.length?`<button data-dk="pass">${lbl}</button>`:mt&&g.ph=="d"?`<button class="g" data-dk="take">Беру</button>`:"";
+ const msg=g.over?"":g.who==0?(g.ph=="t"?(g.table.length?"Подкинь карту или нажми «"+lbl+"»":"Твой ход — ходи любой картой"):(open.length>1?"Выбери карту, затем карту на столе":"Побей карту или возьми")):"Ходит "+g.pl[g.who].name+"…";
+ return`<div class="row sp" style="margin-bottom:10px"><button class="g s" data-a="gx">${ic("back",16)}К играм</button><button class="g s" data-a="gn">Новая раздача</button></div><div class="dk">${op}${dc}<div class="tb">${tb}</div><div class="inf">${E(msg)}</div><div class="act">${btn}</div><div class="hand">${hand}</div>${g.over?`<div class="ov"><div class="card"><h3>Игра окончена</h3><div style="font-size:20px;font-weight:800;margin-bottom:14px">${E(g.over)}</div><button data-dk="new">Ещё раз</button></div></div>`:""}</div>`}
+document.addEventListener("click",e=>{const x=e.target.closest("[data-dk]");if(!x)return;const g=S.cg,d=x.dataset.dk;if(!g||!g.dur)return;
+ if(d=="new"){dkNew();return}
+ if(g.over)return;if(g.who!=0){toast("Сейчас ходит "+g.pl[g.who].name);return}
+ if(d=="h"){const c=x.dataset.c;if(g.ph=="t"){if(canT(g,c))dkThrow(0,c);else toast("Эту карту подкинуть нельзя")}
+  else{const o=g.table.filter(t=>!t.d);g.sel=g.sel==c?null:c;if(o.length==1&&g.sel){if(beats(g,o[0].a,c))dkBeat(o[0],c);else{g.sel=null;toast("Эта карта не бьёт")}}draw()}}
+ if(d=="t"&&g.sel){const t=g.table[+x.dataset.i];if(beats(g,t.a,g.sel))dkBeat(t,g.sel);else toast("Эта карта не бьёт")}
+ if(d=="pass"&&g.ph=="t"&&g.table.length)dkPass(0);
+ if(d=="take"&&g.ph=="d")dkTake()});
+</script></body></html>
