@@ -231,7 +231,7 @@ function cab(){const m=S.me,r=calcR(),c=r.c;
  return`<div class="card" style="text-align:center"><div class="av big" style="background:${m.avatar?`url(${m.avatar}) center/cover`:`linear-gradient(135deg,hsl(${m.color},80%,60%),hsl(${m.color+50},80%,55%))`}">${m.avatar?"":E((m.name||"?")[0].toUpperCase())}<label for="af">${ic("plus",18)}</label><input id="af" type="file" accept="image/*" hidden></div>
  <input class="nmi" data-p="name" value="${E(m.name)}" maxlength="20"><div class="m" style="margin-bottom:12px">${ST[m.status][0]}</div>
  <div class="chips" style="justify-content:center">${Object.entries(ST).map(([k,v])=>`<span class="chip ${m.status==k?"on":""}" data-a="st" data-k="${k}">${ic(v[2],16)}${v[0]}</span>`).join("")}</div>
- <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"><div class="m" style="margin-top:14px">${m.code?"Мой код для друзей: <b>"+E(m.code)+"</b>":""}</div><button class="s" data-p="pn" style="margin-top:14px;width:100%">🔔 Включить уведомления на телефон</button><button class="g s" data-p="out" style="margin-top:10px">Выйти</button></div>
+ <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"><div class="m" style="margin-top:14px">${m.code?"Мой ID: <b>"+E(m.code)+"</b>":""}</div><button class="s" data-p="pn" style="margin-top:14px;width:100%">🔔 Включить уведомления на телефон</button><button class="g s" data-p="out" style="margin-top:10px">Выйти</button></div>
  <div class="card"><h3>${ic("coin",16)} Калькулятор расходов</h3>
  <div class="chips" style="margin-bottom:12px">${CUR.map(x=>`<span class="chip ${c.cur==x?"on":""}" data-p="cur" data-k="${x}">${x}</span>`).join("")}</div>
  <div class="m">Зарплата</div><input data-p="sal" type="number" inputmode="decimal" placeholder="0" value="${c.sal||""}" style="margin:6px 0 12px;font-size:20px;font-weight:700">
@@ -386,10 +386,10 @@ const _h=home;home=function(){const q=REQ.map(r=>`<div class="card" style="borde
 const _d2=draw;draw=function(){_d2();if(!window.ONLINE||!S.me.name)return;if(tab=="fam"){if(!LOADED[room]){LOADED[room]=1;loadMsgs(room)}if(room!="all"){const fs=$("#fs");if(fs){const r=fs.parentElement;r.previousElementSibling?.remove();r.remove()}}}};
 setInterval(async()=>{if(!UID)return;const m=S.me,o={name:m.name,color:m.color,avatar:m.avatar||null,status:m.status,txt:m.txt},j=JSON.stringify(o);if(j==lastP)return;const{error}=await sb.from("profiles").update(o).eq("id",UID);if(!error){lastP=j;const k=m.status+"|"+m.txt;if(k!=lastS){if(lastS)notifyFriends("status",S.me.name+": "+(m.txt||ST[m.status][0]));lastS=k}}},2500);
 function addModal(){const d=document.createElement("div");d.style.cssText="position:fixed;inset:0;z-index:60;background:#000a;display:grid;place-items:center;padding:18px";
- d.innerHTML=`<div class="card" style="width:100%;max-width:380px;margin:0"><h3>${ic("users",16)} Добавить друга</h3><div class="m">Твой код — отправь его другу:</div><div style="font-size:34px;font-weight:800;letter-spacing:4px;margin:8px 0 16px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;color:transparent">${E(S.me.code||"")}</div><input id="fc2" placeholder="Код друга" maxlength="6" style="text-transform:uppercase"><div class="row" style="margin-top:12px"><button id="fgo" class="f1">Добавить</button><button class="g" id="fx">Закрыть</button></div><div class="m" id="fm2" style="margin-top:10px;min-height:18px"></div></div>`;
+ d.innerHTML=`<div class="card" style="width:100%;max-width:380px;margin:0"><h3>${ic("users",16)} Добавить друга</h3><div class="m">Твой ID — отправь его другу, чтобы он смог тебя добавить:</div><div style="font-size:34px;font-weight:800;letter-spacing:4px;margin:8px 0 16px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;color:transparent">${E(S.me.code||"")}</div><input id="fc2" placeholder="ID друга (6 символов)" maxlength="6" style="text-transform:uppercase"><div class="row" style="margin-top:12px"><button id="fgo" class="f1">Добавить</button><button class="g" id="fx">Закрыть</button></div><div class="m" id="fm2" style="margin-top:10px;min-height:18px"></div></div>`;
  document.body.appendChild(d);const say=t=>d.querySelector("#fm2").textContent=t;d.querySelector("#fx").onclick=()=>d.remove();
  d.querySelector("#fgo").onclick=async()=>{const c=d.querySelector("#fc2").value.trim().toUpperCase();if(!c)return;if(c==S.me.code)return say("Это твой собственный код");
-  const{data:p}=await sb.from("profiles").select("id,name").eq("code",c).maybeSingle();if(!p)return say("Такого кода нет");
+  const{data:p}=await sb.from("profiles").select("id,name").eq("code",c).maybeSingle();if(!p)return say("Пользователь с таким ID не найден");
   const{error}=await sb.from("friendships").insert({from_id:UID,to_id:p.id});if(error)return say(error.code=="23505"?"Заявка уже отправлена":"Не получилось: "+error.message);
   sb.from("notifications").insert({user_id:p.id,kind:"friend",data:{text:S.me.name+" хочет дружить"}}).then(()=>{});say("Заявка отправлена: "+p.name);loadFriends()}}
 document.addEventListener("click",e=>{if(!window.ONLINE)return;
@@ -408,7 +408,7 @@ let ONG=null,GINV=[],GCH=null,lastS="";
 const notifyFriends=(kind,text,x={})=>{if(S.friends.length)sb.from("notifications").insert(S.friends.map(f=>({user_id:f.id,kind,data:{text,from:UID,...x}}))).then(()=>{})};
 const _si2=sendInvite;sendInvite=function(k){_si2(k);lastS=S.me.status+"|"+S.me.txt};
 const _on=onNote;onNote=function(n){_on(n);if(n.kind=="game"&&n.data?.gid&&Date.now()-n.data.gid<18e5){GINV.unshift({gid:n.data.gid,from:n.data.from});nm(n.data.from).then(()=>{if(tab=="rest"&&!GM)draw()})}};
-const _am=addModal;addModal=function(){_am();loadAll()};
+const _am=addModal;addModal=function(){_am()};
 async function loadAll(){const d=document.body.lastElementChild,{data}=await sb.from("profiles").select("id,name,color,avatar,status,txt").neq("id",UID).limit(40);
  const skip=new Set([...S.friends.map(f=>f.id),...REQ.map(r=>r.id)]),L=(data||[]).filter(p=>!skip.has(p.id));L.forEach(p=>PROF[p.id]=p);
  const box=document.createElement("div");box.style.cssText="margin-top:14px;max-height:34vh;overflow:auto";
@@ -635,15 +635,15 @@ rest=function(){if(GM=="cards"&&S.cg)return cardsView();if(GM=="ck"&&S.ck)return
  return inv+lob+hubGrid(cb,kb)};
 /* ---------- чат ---------- */
 chat=function(){const fm=S.fams.find(x=>x.id==room),f=fm&&F(fm.members[0]);
- return`<div class="sc" style="margin-bottom:12px"><span class="chip ${room=="all"?"on":""}" data-a="sf" data-k="all">${ic("chat",16)}Общий</span>${S.fams.map(x=>`<span class="chip ${room==x.id?"on":""}" data-a="sf" data-k="${x.id}">${mini(F(x.members[0]),22)}${E(x.name)}</span>`).join("")}</div>
- <div class="card"><div class="row" style="margin-bottom:4px">${f?mini(f,44):'<div style="width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,var(--a),var(--b))">💬</div>'}<div class="f1"><b style="font-size:17px">${f?E(f.name):"Общий чат"}</b><div class="m">${f?(ST[f.status]||ST.free)[0]:"все участники «Свои»"}</div></div></div><div id="vbn"></div></div>
- <div class="card" style="padding:10px 12px"><div id="ml" style="min-height:200px"></div></div>
- <div class="cmp e" id="cmp"><label class="ib" for="pf">📎</label><input id="pf" type="file" accept="image/*" hidden><input id="mt" placeholder="Сообщение" class="f1"><button data-a="send" id="sd">${ic("send",18)}</button><button class="g" data-p="rec" id="mk">🎤</button></div>`};
+ return`<div class="chatfs"><div class="chh"><button class="g" data-t="home" style="width:40px;height:40px;padding:0;border-radius:50%;font-size:24px;flex:none">‹</button>${f?mini(f,40):'<div style="width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:20px;background:linear-gradient(135deg,var(--a),var(--b));flex:none">💬</div>'}<div class="f1" style="min-width:0"><b style="font-size:17px">${f?E(f.name):"Общий чат"}</b><div class="m">${f?(ST[f.status]||ST.free)[0]:"все участники «Свои»"}</div></div></div>
+ <div class="sc" style="margin:8px 0"><span class="chip ${room=="all"?"on":""}" data-a="sf" data-k="all">${ic("chat",16)}Общий</span>${S.fams.map(x=>`<span class="chip ${room==x.id?"on":""}" data-a="sf" data-k="${x.id}">${mini(F(x.members[0]),22)}${E(x.name)}</span>`).join("")}</div>
+ <div id="vbn"></div><div id="ml"></div>
+ <div class="cmp e" id="cmp"><label class="ib" for="pf">📎</label><input id="pf" type="file" accept="image/*" hidden><input id="mt" placeholder="Сообщение" class="f1"><button data-a="send" id="sd">${ic("send",18)}</button><button class="g" data-p="rec" id="mk">🎤</button></div></div>`};
 function mBody(m){const b=m.body||"";if(b.startsWith("img:")){const u=b.slice(4);return`<img class="mi" src="${E(u)}" data-img="${E(u)}" loading="lazy">`}
  if(b.startsWith("voice:")){const[u,d]=b.slice(6).split("|");let h=0;for(const c of u)h=(h*31+c.charCodeAt(0))%997;return`<div class="vm" data-u="${E(u)}"><button class="vp" data-vp="${E(u)}">▶</button><div class="wv">${Array.from({length:26},(_,i)=>`<s style="height:${Math.round(30+(Math.sin(i*1.7+h)*.5+.5)*70)}%"></s>`).join("")}</div><span>${fmtD(+d||0)}</span></div>`}return E(b)}
 updMsgs=function(){const el=$("#ml");if(!el)return;const ms=(S.msgs[room]||[]).slice(-60);
  el.innerHTML=ms.map((m,i)=>{const me=m.f=="me",p=me?S.me:PROF[m.f]||F(m.f),first=!ms[i-1]||ms[i-1].f!=m.f;
-  return`<div class="mr ${me?"me":""}">${first?mini(p,32):'<div style="width:32px;flex:none"></div>'}<div class="bb">${!me&&first&&room=="all"?`<small>${E(p.name)}</small>`:""}${mBody(m)}<em>${ft(m.ts)}</em></div></div>`}).join("")||'<div class="m" style="text-align:center;padding:30px 0">Пока тихо. Напиши первым 👋</div>';$("#v").scrollTop=1e9};
+  return`<div class="mr ${me?"me":""}">${first?mini(p,32):'<div style="width:32px;flex:none"></div>'}<div class="bb">${!me&&first&&room=="all"?`<small>${E(p.name)}</small>`:""}${mBody(m)}<em>${ft(m.ts)}</em></div></div>`}).join("")||'<div class="m" style="text-align:center;padding:30px 0">Пока тихо. Напиши первым 👋</div>';el.scrollTop=el.scrollHeight};
 const VA=new Audio();let VAel=null;
 const vbars=p=>{if(!VAel)return;const b=[...VAel.querySelectorAll("s")],n=Math.round(p*b.length);b.forEach((x,i)=>x.classList.toggle("on",i<n))};
 VA.ontimeupdate=()=>{if(VAel&&VA.duration)vbars(VA.currentTime/VA.duration)};
@@ -733,10 +733,10 @@ function rgDrop(){const o=RG;RG=null;BS=null;GM=null;if(o&&o.ch)setTimeout(()=>s
 function rgClose(){const o=RG;if(o){if(o.host){rgTx({t:"x"});if(o.ids.length)sb.from("notifications").insert(o.ids.map(id=>({user_id:id,kind:"cancel",data:{gid:o.gid,text:S.me.name+" закрыл(а) игру"}}))).then(()=>{})}else rgTx({t:"left",u:UID})}rgDrop()}
 function rgMsg(m){if(!RG)return;
  if(m.t=="join"&&RG.host){RG.joined.add(m.u);toast(F(m.u).name+" с нами");if(RG.kind=="bs"&&!BS){BS=bsNew(F(m.u));RG.started=true;GM="bs"}draw();return}
- if(m.t=="st"&&!RG.host){RG.s=m.s;RG.started=true;if(GM!="mono"){GM="mono";tab="rest"}draw();return}
- if(m.t=="act"&&RG.host){mAct(m.u,m.a);return}
+ if(m.t=="st"&&!RG.host){RG.s=m.s;RG.started=true;mSync();if(GM!="mono"){GM="mono";tab="rest"}draw();return}
+ if(m.t=="act"&&RG.host){mAct(m.u,m.a,m.x);return}
  if(m.t=="x"&&!RG.host){toast("Хозяин закрыл игру");rgDrop();return}
- if(m.t=="left"&&RG.host){if(RG.kind=="mono"&&RG.s){const s=RG.s,i=s.pl.findIndex(p=>p.id==m.u);if(i>=0&&!s.pl[i].out){s.pl[i].out=true;mBust(i,true);if(s.turn==i){s.log.unshift(s.pl[i].name+" вышел");mEnd("")}else{const al=s.pl.filter(x=>!x.out);if(al.length<2){s.ph="over";s.win=s.pl.indexOf(al[0])}}mTick()}}else{toast("Соперник вышел");rgDrop()}return}
+ if(m.t=="left"&&RG.host){if(RG.kind=="mono"&&RG.s){const s=RG.s,i=s.pl.findIndex(p=>p.id==m.u);if(i>=0&&!s.pl[i].out){s.pl[i].out=true;mBust(i,true);if(s.turn==i){mEnd(s.pl[i].name+" вышел")}else{const al=s.pl.filter(x=>!x.out);if(al.length<2){s.ph="over";s.win=s.pl.indexOf(al[0])}}mTick()}}else{toast("Соперник вышел");rgDrop()}return}
  if(RG.kind=="bs")bsMsg(m)}
 /* ---- меню ---- */
 const rgNames={mono:"Монополию",bs:"Морской бой"};
@@ -751,34 +751,100 @@ function hubGrid(cb,kb){const frs=window.ONLINE&&S.friends.length,none='<div cla
   mono:(RG?'<div class="m">Игра уже открыта — смотри выше</div>':(frs?fch:none)+bots+`<button data-p="rgm" style="width:100%;margin-top:14px">${RSEL.size?"Позвать за стол":"Играть с ботами"}</button>`),
   bs:RG?'<div class="m">Игра уже открыта — смотри выше</div>':(frs?S.friends.map(f=>`<div class="row sp" style="margin-bottom:10px"><span class="row">${mini(f,38)}<b>${E(f.name)}</b></span><button class="s" data-p="rgb" data-k="${f.id}">Играть</button></div>`).join(""):none)+'<div class="gdiv">или</div><button class="g" data-p="bsb" style="width:100%">🤖 Против бота</button>'};
  return rgInv()+`<div class="hg">${GM4.map(([k,n,s,h])=>`<div class="hgt ${GSEL==k?"on":""}" style="--h:${h}" data-p="gs" data-k="${k}">${SV[k]}<b>${n}</b><small>${s}</small></div>`).join("")}</div>`+(GSEL?`<div class="card gp"><h3>${GM4.find(x=>x[0]==GSEL)[1]}</h3>${body[GSEL]}</div>`:"")}
-/* ---- Монополия ---- */
-const MB=[["СТАРТ","s"],["Кофейня","p",60,0],["Шанс","c"],["Пекарня","p",60,0],["Налог","t",100],["Вокзал","r",200],["Кинотеатр","p",100,1],["Бар","p",100,1],["Тюрьма","j"],["Парк","p",140,2],["Шанс","c"],["Музей","p",140,2],["Галерея","p",160,2],["Вокзал","r",200],["Отель","p",180,3],["Спа","p",180,3],["Отдых","f"],["Стадион","p",220,4],["Шанс","c"],["Арена","p",220,4],["Налог","t",150],["Вокзал","r",200],["Банк","p",260,5],["Биржа","p",260,5],["В тюрьму","g"],["Яхт-клуб","p",300,6],["Шанс","c"],["Остров","p",300,6],["Вокзал","r",200],["Небоскрёб","p",350,7],["Шанс","c"],["Дворец","p",400,7]];
-const MHUE=[25,200,150,270,48,340,110,300],MC=[["💰 Банк ошибся: +100",p=>p.cash+=100],["🎁 Подарок: +150",p=>p.cash+=150],["🧾 Штраф: −60",p=>p.cash-=60],["🔧 Ремонт: −100",p=>p.cash-=100],["🚀 Вперёд на 3 клетки",p=>{p.pos=(p.pos+3)%32}],["🏁 На СТАРТ: +200",p=>{p.pos=0;p.cash+=200}],["👮 В тюрьму!",p=>{p.pos=8;p.jail=2}]];
-const MPOS=i=>i==0?[8,8]:i<=8?[8,8-i]:i<=16?[16-i,0]:i<=24?[0,i-16]:[i-24,8];
+/* ---- Монополия 2.0: 40 клеток, филиалы, залог, джекпот, анимации ---- */
+document.head.insertAdjacentHTML("beforeend",`<style>
+.mn{display:grid;grid-template-columns:1.5fr repeat(9,1fr) 1.5fr;grid-template-rows:1.5fr repeat(9,1fr) 1.5fr;gap:2px;aspect-ratio:1;border-radius:22px;padding:5px;background:#0b0b14;box-shadow:0 24px 50px -20px #000d,0 0 0 5px #ffffff10;position:relative}
+.mq{position:relative;background:#f3efe6;border-radius:5px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1f2937;cursor:pointer;min-width:0;transition:transform .3s var(--bounce),filter .2s}.mq:active{transform:scale(.9)}
+.mq em{font-style:normal;font-size:clamp(11px,3.7vw,22px);line-height:1}.mq.cn em{font-size:clamp(18px,6vw,34px)}.mq b{font-size:clamp(6px,2vw,10px);font-weight:800;opacity:.75;margin-top:1px}
+.mq s{position:absolute;top:1px;left:0;right:0;text-align:center;font-size:clamp(5px,1.7vw,8px);text-decoration:none;color:#f59e0b;line-height:1;text-shadow:0 1px 0 #0003}
+.mq.ow:after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--oc)}.mq .lk{position:absolute;top:2px;right:2px;font-size:8px;text-decoration:none}
+.mq .tk{position:absolute;inset:auto 0 5px 0;display:flex;justify-content:center;gap:1px;flex-wrap:wrap}
+.tk i{width:clamp(10px,3.4vw,18px);aspect-ratio:1;border-radius:50%;border:2px solid #fff;box-shadow:0 3px 6px #0009;background-size:cover!important;animation:pop .4s var(--bounce)}.tk i.hop{animation:hop .28s ease-out}@keyframes hop{50%{transform:translateY(-9px) scale(1.3)}}
+.mcn{grid-area:2/2/11/11;background:radial-gradient(120% 90% at 50% 0,#2b2663,#0d0c1d 70%);border-radius:16px;color:#fff;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;overflow:hidden}
+.jp{font-size:12px;background:#ffffff14;padding:3px 10px;border-radius:12px}.dc{display:flex;gap:10px}
+.die{background:#fff;color:#111;border-radius:12px;font-size:min(10vw,42px);line-height:1.12;padding:0 5px;box-shadow:0 6px 12px #0006}.die.rl{animation:rolld .7s var(--bounce) both}@keyframes rolld{0%{transform:rotate(-260deg) scale(.2) translateY(40px);opacity:0}100%{transform:none;opacity:1}}
+.mlg{font-size:11px;line-height:1.4;width:100%;text-align:left;margin-top:auto}.mlg div{opacity:.92}.mlg b{font-weight:700}
+.mpl2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.pp{position:relative;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:20px;background:var(--c2);min-width:0;transition:box-shadow .3s,transform .4s var(--bounce)}.pp.on{box-shadow:0 0 0 2px hsl(var(--h),85%,60%),0 0 22px hsl(var(--h),85%,60%,.45);transform:translateY(-2px)}.pp.out{opacity:.35}
+.pp b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pp .mo{font-size:18px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}.pp small{opacity:.7;font-size:11px}
+.pp .fl{position:absolute;right:12px;top:6px;font-weight:800;font-size:15px;pointer-events:none;animation:flo 1.4s ease-out both}.fl.up{color:#34d399}.fl.dn{color:#fb7185}@keyframes flo{0%{opacity:0;transform:translateY(8px)}15%{opacity:1}100%{opacity:0;transform:translateY(-26px)}}
+.rt{margin:12px 0;border-radius:16px;background:var(--c2);overflow:hidden;text-align:left}.rt div{display:flex;justify-content:space-between;padding:8px 14px;font-size:14px}.rt div.on{background:linear-gradient(90deg,var(--a),var(--b));color:#fff}
+</style>`);
+const MB=[["СТАРТ","🚀","s"],["Кофейня","☕","p",60,0],["Шанс","❓","c"],["Пекарня","🥐","p",60,0],["Налог","💸","t",200],["Вокзал","🚂","r",200],["Кинотеатр","🎬","p",100,1],["Шанс","❓","c"],["Бар","🍸","p",100,1],["Клуб","🪩","p",120,1],["Тюрьма","🔒","j"],["Парк","🌳","p",140,2],["Электро","⚡","r",150],["Музей","🏛️","p",140,2],["Галерея","🖼️","p",160,2],["Вокзал","🚂","r",200],["Отель","🏨","p",180,3],["Шанс","❓","c"],["Спа","🧖","p",180,3],["Курорт","🏝️","p",200,3],["Джекпот","🎰","f"],["Стадион","🏟️","p",220,4],["Шанс","❓","c"],["Арена","🎤","p",220,4],["Цирк","🎪","p",240,4],["Вокзал","🚂","r",200],["Банк","🏦","p",260,5],["Биржа","📈","p",260,5],["Водоканал","💧","r",150],["Фонд","💼","p",280,5],["В тюрьму","👮","g"],["Яхт-клуб","⛵","p",300,6],["Остров","🌴","p",300,6],["Шанс","❓","c"],["Маяк","🗼","p",320,6],["Вокзал","🚂","r",200],["Шанс","❓","c"],["Небоскрёб","🏙️","p",350,7],["Налог","💸","t",100],["Дворец","👑","p",400,7]];
+const MHUE=[25,200,150,270,48,340,110,300],RM=[1,5,15,45,80,125],bc=q=>Math.round(q[3]/20)*10;
+const MC=[["💰 Банк ошибся в вашу пользу: +150$",p=>{p.cash+=150}],["🎁 День рождения! Все дарят вам по 30$",(p,s)=>{s.pl.forEach(o=>{if(!o.out&&o!=p){o.cash-=30;p.cash+=30}})}],["🧾 Штраф за парковку: −80$",(p,s)=>{p.cash-=80;s.jp+=80}],["🔧 Ремонт квартиры: −120$",(p,s)=>{p.cash-=120;s.jp+=120}],["🚀 Идёте на СТАРТ: +200$",p=>{p.pos=0;p.cash+=200}],["🏝️ Отпуск! Вперёд на 3 клетки",p=>{p.pos=(p.pos+3)%40}],["👮 Отправляйтесь в тюрьму",p=>{p.pos=10;p.jail=3}],["📈 Дивиденды: +100$",p=>{p.cash+=100}],["🎰 Лотерея: +250$",p=>{p.cash+=250}]];
+const MPOS=i=>i==0?[10,10]:i<=10?[10,10-i]:i<=20?[20-i,0]:i<=30?[0,i-20]:[i-30,10];
+const grp=g=>MB.map((q,i)=>q[2]=="p"&&q[4]==g?i:-1).filter(i=>i>=0);
 function mNew(ids,bots){const hue=[260,20,150,340],pl=[{id:UID,name:S.me.name},...ids.map(id=>({id,name:F(id).name})),...Array.from({length:Math.max(0,Math.min(bots,3-ids.length))},(_,i)=>({id:"bot"+i,name:"Бот "+(i+1),bot:1}))].map((p,i)=>({...p,color:hue[i],pos:0,cash:1500,jail:0,out:false}));
- return{pl,own:{},turn:0,ph:"roll",dice:[1,1],rid:0,log:["Игра началась — бросай кубики!"],win:null}}
-function mBust(i,quiet){const s=RG.s;s.pl[i].out=true;for(const k in s.own)if(s.own[k]==i)delete s.own[k]}
-function mRent(i,o){const s=RG.s,q=MB[i];if(q[1]=="r")return 25*MB.filter((x,k)=>x[1]=="r"&&s.own[k]==o).length;const full=MB.every((x,k)=>x[1]!="p"||x[3]!=q[3]||s.own[k]==o);return Math.round(q[2]/10)*(full?2:1)}
-function mEnd(m){const s=RG.s,p=s.pl[s.turn];if(m)s.log=[m,...s.log].slice(0,4);if(p.cash<0&&!p.out){mBust(s.turn);s.log.unshift(p.name+" обанкротился 💥")}
- const al=s.pl.filter(x=>!x.out);if(al.length<2){s.ph="over";s.win=s.pl.indexOf(al[0])}else{do{s.turn=(s.turn+1)%s.pl.length}while(s.pl[s.turn].out);s.ph="roll"}}
-function mRoll(){const s=RG.s,p=s.pl[s.turn],a=1+Math.random()*6|0,b=1+Math.random()*6|0;s.dice=[a,b];s.rid++;let m=p.name+": "+a+"+"+b;
- if(p.jail){if(a==b){p.jail=0;m+=" · дубль, свобода!"}else{p.jail--;if(!p.jail){p.cash-=50;m+=" · заплатил 50$ и вышел"}else m+=" · сидит в тюрьме";return mEnd(m)}}
- const np=(p.pos+a+b)%32;if(np<p.pos){p.cash+=200;m+=" · СТАРТ +200$"}p.pos=np;const q=MB[np];
- if(q[1]=="p"||q[1]=="r"){const o=s.own[np];if(o==null){s.ph="buy";s.pm=m;return}if(o!=s.turn){const r=mRent(np,o);p.cash-=r;s.pl[o].cash+=r;m+=` · аренда ${r}$ → ${s.pl[o].name}`}}
- else if(q[1]=="t"){p.cash-=q[2];m+=` · налог ${q[2]}$`}else if(q[1]=="c"){const c=rnd(MC);c[1](p);m+=" · "+c[0]}else if(q[1]=="g"){p.pos=8;p.jail=2;m+=" · 👮 В тюрьму!"}
- mEnd(m)}
-function mAct(u,a){const s=RG&&RG.s;if(!s||s.ph=="over")return;const p=s.pl[s.turn];if(p.id!=u)return;
- if(a=="roll"&&s.ph=="roll")mRoll();else if(s.ph=="buy"){const q=MB[p.pos];if(a=="buy"&&p.cash>=q[2]){p.cash-=q[2];s.own[p.pos]=s.turn;mEnd(s.pm+" · купил "+q[0]+" за "+q[2]+"$")}else if(a=="skip")mEnd(p.name+" не стал покупать "+q[0])}mTick()}
-function mTick(){draw();rgTx({t:"st",s:RG.s});const s=RG.s,p=s.pl[s.turn];if(p&&p.bot&&s.ph!="over")setTimeout(()=>{if(RG&&RG.s===s&&s.pl[s.turn]===p)mAct(p.id,s.ph=="roll"?"roll":p.cash>=MB[p.pos][2]+150?"buy":"skip")},1000)}
-const DF=["⚀","⚁","⚂","⚃","⚄","⚅"];let LRID=-1;
+ return{pl,own:{},h:{},mg:{},turn:0,ph:"roll",dice:[1,1],rid:0,mv:0,dd:false,dc:0,jp:0,log:["Игра началась. Удачи!"],win:null}}
+function mBust(i){const s=RG.s;s.pl[i].out=true;for(const k in s.own)if(s.own[k]==i){delete s.own[k];delete s.h[k];delete s.mg[k]}}
+function mRent(i,o){const s=RG.s,q=MB[i];if(q[2]=="r")return Math.round(q[3]/8)*MB.filter((x,k)=>x[2]=="r"&&s.own[k]==o).length;const st=s.h[i]||0,full=grp(q[4]).every(k=>s.own[k]===o);return Math.max(2,Math.round(q[3]/30))*RM[st]*(st==0&&full?2:1)}
+function mRaise(idx){const s=RG.s,p=s.pl[idx];if(p.cash>=0)return;const mine=Object.keys(s.own).filter(k=>s.own[k]==idx).map(Number);
+ for(const k of mine){while((s.h[k]||0)>0&&p.cash<0){s.h[k]--;p.cash+=Math.round(bc(MB[k])/2)}}for(const k of mine){if(p.cash>=0)break;if(!s.mg[k]){s.mg[k]=1;p.cash+=MB[k][3]/2|0}}}
+function mFinish(){const s=RG.s,idx=s.turn,p=s.pl[idx];mRaise(idx);if(p.cash<0&&!p.out){mBust(idx);s.log=[...s.log,p.name+" обанкротился 💥"].slice(-6)}
+ const al=s.pl.filter(x=>!x.out);if(al.length<2){s.ph="over";s.win=s.pl.indexOf(al[0]);return}
+ if(s.dd&&!p.out&&!p.jail){s.dc++;s.ph="roll";s.log=[...s.log,p.name+" ходит ещё раз"].slice(-6)}else{do{s.turn=(s.turn+1)%s.pl.length}while(s.pl[s.turn].out);s.ph="roll";s.dc=0;s.dd=false}}
+function mEnd(m){const s=RG.s;if(m)s.log=[...s.log,m].slice(-6);s.dd=false;mFinish()}
+function mLand(p,idx){const s=RG.s,L=m=>{s.log=[...s.log,m].slice(-6)},q=MB[p.pos],t=q[2];
+ if(t=="p"||t=="r"){const o=s.own[p.pos];if(o==null){s.ph="buy";L(`${p.name} оказывается на «${q[0]}»`);return}if(o!=idx&&!s.mg[p.pos]){const r=mRent(p.pos,o);p.cash-=r;s.pl[o].cash+=r;L(`${p.name} платит ${r}$ аренды → ${s.pl[o].name} («${q[0]}»)`)}else if(o!=idx)L(`${p.name} на «${q[0]}» — поле заложено, платить не нужно`)}
+ else if(t=="t"){p.cash-=q[3];s.jp+=q[3];L(`${p.name} платит налог ${q[3]}$ в Джекпот`)}
+ else if(t=="c"){const c=rnd(MC);L(`${p.name}: ${c[0]}`);c[1](p,s);if(p.jail)s.dd=false}
+ else if(t=="f"){if(s.jp>0){p.cash+=s.jp;L(`${p.name} срывает Джекпот: ${s.jp}$ 🎰`);s.jp=0}else L(p.name+" заезжает на Джекпот, но он пуст")}
+ else if(t=="g"){p.pos=10;p.jail=3;s.dd=false;L(p.name+" арестован 👮")}
+ s.ph="post"}
+function mRoll(){const s=RG.s,idx=s.turn,p=s.pl[idx],a=1+Math.random()*6|0,b=1+Math.random()*6|0,L=m=>{s.log=[...s.log,m].slice(-6)};s.dice=[a,b];s.rid++;s.dd=a==b;L(`${p.name} выбрасывает ${a}:${b}`+(a==b?" (дубль!)":""));s.mv=0;
+ if(p.jail){if(a==b){p.jail=0;L(p.name+" выходит из тюрьмы по дублю")}else{p.jail--;if(p.jail>0){L(p.name+" остаётся в тюрьме");s.dd=false;s.ph="post";return}p.cash-=50;s.jp+=50;L(p.name+" платит 50$ и выходит")}}
+ else if(s.dd&&s.dc==2){p.pos=10;p.jail=3;s.dd=false;L(p.name+" — три дубля подряд, в тюрьму!");s.ph="post";return}
+ const n=a+b;s.mv=n;if(p.pos+n>=40){p.cash+=200;L(p.name+" проходит круг и получает 200$")}p.pos=(p.pos+n)%40;mLand(p,idx)}
+function mProp(a,i,idx){const s=RG.s,p=s.pl[idx],q=MB[i];if(s.own[i]!==idx)return;const st=s.h[i]||0,L=m=>{s.log=[...s.log,m].slice(-6)};
+ if(a=="mort"&&!s.mg[i]&&!st){s.mg[i]=1;p.cash+=q[3]/2|0;L(`${p.name} закладывает «${q[0]}»`)}
+ else if(a=="unmort"&&s.mg[i]){const c=Math.round(q[3]*.55);if(p.cash>=c){delete s.mg[i];p.cash-=c;L(`${p.name} выкупает «${q[0]}» из залога`)}}
+ else if(q[2]=="p"){const gr=grp(q[4]);
+  if(a=="build"&&st<5&&gr.every(k=>s.own[k]===idx&&!s.mg[k])&&st<=Math.min(...gr.map(k=>s.h[k]||0))&&p.cash>=bc(q)){p.cash-=bc(q);s.h[i]=st+1;L(`${p.name} строит филиал компании «${q[0]}». Аренда возрастает`)}
+  else if(a=="sell"&&st>0&&st>=Math.max(...gr.map(k=>s.h[k]||0))){s.h[i]=st-1;p.cash+=Math.round(bc(q)/2);L(`${p.name} продаёт филиал «${q[0]}»`)}}}
+function mAct(u,a,x){const s=RG&&RG.s;if(!s||s.ph=="over")return;const idx=s.turn,p=s.pl[idx];if(p.id!=u)return;if(a!="roll")s.mv=0;const L=m=>{s.log=[...s.log,m].slice(-6)};
+ if(a=="roll"&&s.ph=="roll")mRoll();
+ else if(a=="pay"&&s.ph=="roll"&&p.jail&&p.cash>=50){p.cash-=50;s.jp+=50;p.jail=0;L(p.name+" выкупается из тюрьмы за 50$")}
+ else if(a=="buy"&&s.ph=="buy"){const q=MB[p.pos];if(p.cash<q[3])return;p.cash-=q[3];s.own[p.pos]=idx;s.ph="post";L(`${p.name} выкупает «${q[0]}»`)}
+ else if(a=="skip"&&s.ph=="buy"){s.ph="post";L(p.name+" отказывается от покупки")}
+ else if(a=="end"&&s.ph=="post")mFinish();
+ else if((s.ph=="roll"||s.ph=="post")&&["build","sell","mort","unmort"].includes(a))mProp(a,+x,idx);
+ else return;mTick()}
+function botAct(s,p,idx){if(s.ph=="roll")return p.jail&&p.cash>400?["pay"]:["roll"];if(s.ph=="buy")return[p.cash>=MB[p.pos][3]+150?"buy":"skip"];
+ for(const k in s.own)if(s.own[k]==idx&&MB[k][2]=="p"&&!s.mg[k]){const q=MB[k],gr=grp(q[4]),st=s.h[k]||0;if(gr.every(j=>s.own[j]===idx&&!s.mg[j])&&st<5&&st<=Math.min(...gr.map(j=>s.h[j]||0))&&p.cash>bc(q)+350)return["build",k]}return["end"]}
+function mTick(){mSync();draw();rgTx({t:"st",s:RG.s});const s=RG.s,p=s.pl[s.turn];if(p&&p.bot&&s.ph!="over")setTimeout(()=>{if(RG&&RG.s===s&&s.pl[s.turn]===p){const[a,x]=botAct(s,p,s.turn);mAct(p.id,a,x)}},s.mv?1100+s.mv*150:1100)}
+let MD={},MA={},LC={},FX={},RT=0,LRID=-1;
+function mSync(){const s=RG&&RG.s;if(!s)return;if(!RG.i){RG.i=1;MD={};MA={};LC={};FX={}}
+ s.pl.forEach((p,i)=>{if(LC[p.id]!=null&&LC[p.id]!=p.cash)FX[p.id]={v:p.cash-LC[p.id],t:Date.now()};LC[p.id]=p.cash;if(MD[p.id]==null)MD[p.id]=p.pos;
+  if(MD[p.id]!=p.pos&&!MA[p.id]){MA[p.id]=1;setTimeout(function st(){const t=RG&&RG.s&&RG.s.pl[i]?RG.s.pl[i].pos:null;if(t==null){MA[p.id]=0;return}const c=MD[p.id];if(c==t){MA[p.id]=0;draw();return}const d=(t-c+40)%40;MD[p.id]=d<=12?(c+1)%40:t;draw();setTimeout(st,d<=12?150:0)},700)}});
+ if(s.ph=="over"&&!RG.won){RG.won=1;burst("🏆")}}
+const DF=["⚀","⚁","⚂","⚃","⚄","⚅"];
 const mav=p=>p.bot?{name:"Б",color:p.color}:p.id==UID?S.me:PROF[p.id]||F(p.id);
-function monoView(){const s=RG.s,cur=s.pl[s.turn],me=s.pl.findIndex(p=>p.id==UID),mine=cur.id==UID&&s.ph!="over",q=MB[cur.pos],rl=s.rid!=LRID;LRID=s.rid;
- const cell=i=>{const c=MB[i],[r,cl]=MPOS(i),o=s.own[i],ow=o!=null?s.pl[o]:null,ic2={s:"🏁",c:"❓",t:"💸",j:"🔒",f:"☕",g:"👮",r:"🚂",p:""}[c[1]];
-  return`<div class="mc" style="grid-row:${r+1};grid-column:${cl+1};${ow?`box-shadow:inset 0 0 0 3px hsl(${ow.color},85%,55%)`:""}">${c[1]=="p"?`<i style="background:hsl(${MHUE[c[3]]},75%,55%)"></i>`:""}<span>${ic2}</span><b>${c[2]||""}</b><div class="tk">${s.pl.map(p=>!p.out&&p.pos==i?`<u style="background:hsl(${p.color},85%,55%)"></u>`:"").join("")}</div></div>`};
- const act=s.ph=="over"?`<b>🏆 ${E(s.pl[s.win].name)}</b>`:mine?(s.ph=="roll"?`<button data-p="ma" data-k="roll">🎲 Бросить</button>`:`<div style="font-size:12px"><b>${q[0]}</b> · ${q[2]}$</div><div class="row" style="gap:6px;justify-content:center"><button class="s" data-p="ma" data-k="buy" ${cur.cash<q[2]?"disabled":""}>Купить</button><button class="g s" data-p="ma" data-k="skip">Нет</button></div>`):`<div class="mlg">Ходит ${E(cur.name)}…</div>`;
- return`<div class="mb">${MB.map((_,i)=>cell(i)).join("")}<div class="mcn" style="grid-area:2/2/9/9"><div><span class="die ${rl?"rl":""}">${DF[s.dice[0]-1]}</span><span class="die ${rl?"rl":""}">${DF[s.dice[1]-1]}</span></div>${act}<div class="mlg">${s.log.slice(0,3).map(E).join("<br>")}</div></div></div>
- <div class="mpl">${s.pl.map((p,i)=>`<div class="mp ${s.turn==i&&s.ph!="over"?"on":""} ${p.out?"out":""}">${mini(mav(p),34)}<div style="min-width:0"><b>${E(p.name)}${i==me?" (ты)":""}</b><span>${p.cash}$ · ${Object.values(s.own).filter(o=>o==i).length} шт.${p.jail?" 🔒":""}</span></div></div>`).join("")}</div>
- ${s.ph=="over"?`<button data-p="rgl" style="width:100%;margin-top:14px">${s.win==me?"Ура, победа! Выйти":"Выйти"}</button>`:""}`}
+function mcol(t,s){let h=E(t);s.pl.forEach(p=>{h=h.split(E(p.name)).join(`<b style="color:hsl(${p.color},85%,68%)">${E(p.name)}</b>`)});return h}
+function monoView(){const s=RG.s,cur=s.pl[s.turn],me=s.pl.findIndex(p=>p.id==UID),mine=cur.id==UID&&s.ph!="over",busy=Object.values(MA).some(Boolean),now=Date.now();
+ if(s.rid!=LRID){LRID=s.rid;RT=now}const rl=now-RT<700,dl=`animation-delay:-${now-RT}ms`;
+ const cell=i=>{const q=MB[i],[r,c]=MPOS(i),o=s.own[i],ow=o!=null?s.pl[o]:null,st=s.h[i]||0,mg=s.mg[i],t=q[2];
+  const bg=t=="p"?`background:hsl(${MHUE[q[4]]},${mg?15:72}%,${mg?42:78}%);`:t=="r"?"background:#dfe6ee;":t=="c"?"background:#ffe9a8;":t=="t"?"background:#fecdd3;":"";
+  return`<div class="mq ${i%10==0?"cn":""} ${ow?"ow":""}" data-sq="${i}" style="grid-row:${r+1};grid-column:${c+1};${bg}${ow?`--oc:hsl(${ow.color},85%,55%)`:""}"><em>${q[1]}</em>${q[3]?`<b>${q[3]}</b>`:""}${st?`<s>${st==5?"🏨":"★".repeat(st)}</s>`:""}${mg?'<u class="lk">🔒</u>':""}<div class="tk">${s.pl.map(p=>{const a=mav(p);return!p.out&&(MD[p.id]??p.pos)==i?`<i class="${MA[p.id]?"hop":""}" style="background:${a.avatar?`url(${a.avatar}) center/cover`:`hsl(${p.color},85%,58%)`};border-color:hsl(${p.color},85%,70%)"></i>`:""}).join("")}</div></div>`};
+ const q=MB[cur.pos];let act;
+ if(s.ph=="over")act=`<b style="font-size:16px">🏆 ${E(s.pl[s.win].name)}</b>`;
+ else if(!mine||busy)act=`<div style="font-size:12px;opacity:.8">${busy?"…":"Ходит "+E(cur.name)}</div>`;
+ else if(s.ph=="roll")act=(cur.jail?`<button class="g s" data-p="ma" data-k="pay" ${cur.cash<50?"disabled":""}>Выкупиться 50$</button>`:"")+`<button data-p="ma" data-k="roll">🎲 Бросить</button>`;
+ else if(s.ph=="buy")act=`<div style="font-size:13px">${q[1]} <b>${q[0]}</b> · ${q[3]}$</div><div class="row" style="gap:8px;justify-content:center"><button class="s" data-p="ma" data-k="buy" ${cur.cash<q[3]?"disabled":""}>Купить</button><button class="g s" data-p="ma" data-k="skip">Отказаться</button></div>`;
+ else act=`<button data-p="ma" data-k="end">Завершить ход</button><div style="font-size:10px;opacity:.6">Тапни по своей улице, чтобы строить</div>`;
+ const pls=s.pl.map((p,i)=>{const f=FX[p.id],fx=f&&now-f.t<1400?`<i class="fl ${f.v>0?"up":"dn"}" style="animation-delay:-${now-f.t}ms">${f.v>0?"+":""}${f.v}$</i>`:"";
+  return`<div class="pp ${s.turn==i&&s.ph!="over"?"on":""} ${p.out?"out":""}" style="--h:${p.color}">${mini(mav(p),40)}<div style="min-width:0"><b>${E(p.name)}${i==me?" · ты":""}</b><div class="mo">${p.cash}$</div><small>${Object.values(s.own).filter(o=>o==i).length} полей${p.jail?" · 🔒"+p.jail:""}</small></div>${fx}</div>`}).join("");
+ return`<div class="mn">${MB.map((_,i)=>cell(i)).join("")}<div class="mcn"><div class="jp">🎰 Джекпот ${s.jp}$</div><div class="dc"><span class="die ${rl?"rl":""}" style="${rl?dl:""}">${DF[s.dice[0]-1]}</span><span class="die ${rl?"rl":""}" style="${rl?dl:""}">${DF[s.dice[1]-1]}</span></div>${act}<div class="mlg">${s.log.slice(-4).map(l=>`<div>${mcol(l,s)}</div>`).join("")}</div></div></div><div class="mpl2">${pls}</div>${s.ph=="over"?`<button data-p="rgl" style="width:100%;margin-top:14px">Выйти</button>`:""}`}
+function mSheet(i){if(!RG||!RG.s)return;const s=RG.s,q=MB[i],o=s.own[i],ow=o!=null?s.pl[o]:null,me=s.pl.findIndex(p=>p.id==UID),t=q[2],st=s.h[i]||0,mg=s.mg[i],can=s.pl[s.turn].id==UID&&(s.ph=="roll"||s.ph=="post")&&o===me,d=document.createElement("div");
+ let b=`<div style="font-size:50px">${q[1]}</div><div style="font-size:24px;font-weight:800;letter-spacing:-.6px">${q[0]}</div>`;
+ if(t=="p"||t=="r"){b+=`<div class="m" style="margin:6px 0 12px">Цена ${q[3]}$ · ${ow?"владелец: "+E(ow.name):"свободно"}${mg?" · в залоге":""}</div>`;
+  if(t=="p"){const k=Math.max(2,Math.round(q[3]/30));b+=`<div class="rt">${RM.map((m,j)=>`<div class="${j==st?"on":""}"><span>${j==0?"Без филиалов":j==5?"🏨 Отель":"★".repeat(j)+" филиал"}</span><b>${k*m}$</b></div>`).join("")}</div><div class="m">Вся группа у одного владельца — аренда ×2 · филиал стоит ${bc(q)}$</div>`}else b+=`<div class="m">Аренда ${Math.round(q[3]/8)}$ × число твоих корпораций</div>`}
+ else b+=`<div class="m" style="margin:8px 0">${{s:"Проходишь СТАРТ — получаешь 200$",t:"Налог уходит в Джекпот",c:"Случайная карта: удача или штраф",j:"Просто посещение",f:"Заезжай и забери весь Джекпот!",g:"Отправляйся в тюрьму"}[t]}</div>`;
+ if(can&&(t=="p"||t=="r"))b+=`<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:8px;justify-content:center">${t=="p"&&!mg?`<button class="s" data-m="build">Построить −${bc(q)}$</button>${st?`<button class="g s" data-m="sell">Продать +${Math.round(bc(q)/2)}$</button>`:""}`:""}${!mg&&!st?`<button class="g s" data-m="mort">Заложить +${q[3]/2|0}$</button>`:""}${mg?`<button class="s" data-m="unmort">Выкупить −${Math.round(q[3]*.55)}$</button>`:""}</div>`;
+ d.style.cssText="position:fixed;inset:0;z-index:70;background:#0009;display:flex;align-items:flex-end;animation:fade .25s both";
+ d.innerHTML=`<div class="sheet card" style="width:100%;max-width:520px;margin:0 auto;border-radius:32px 32px 0 0;padding:26px 20px calc(24px + env(safe-area-inset-bottom,0px));text-align:center"><div class="sh"></div>${b}</div>`;document.body.appendChild(d);
+ d.onclick=e=>{if(e.target==d)return d.remove();const m=e.target.closest("[data-m]");if(m){if(RG.host)mAct(UID,m.dataset.m,i);else rgTx({t:"act",u:UID,a:m.dataset.m,x:i});d.remove()}}}
+document.addEventListener("click",e=>{const c=e.target.closest("[data-sq]");if(c&&RG&&RG.s&&GM=="mono")mSheet(+c.dataset.sq)});
 /* ---- Морской бой ---- */
 const nb=i=>{const r=i/10|0,c=i%10,o=[];for(let a=-1;a<2;a++)for(let b=-1;b<2;b++){const x=r+a,y=c+b;if(x>=0&&x<10&&y>=0&&y<10)o.push(x*10+y)}return o};
 function bsFleet(){for(;;){const g=Array(100).fill(0),ships=[];let ok=true;for(const n of[4,3,3,2,2,2,1,1,1,1]){let pl=false;for(let t=0;t<300&&!pl;t++){const h=Math.random()<.5,r=Math.random()*(h?10:11-n)|0,c=Math.random()*(h?11-n:10)|0,cells=[];for(let k=0;k<n;k++)cells.push(h?r*10+c+k:(r+k)*10+c);if(cells.every(i=>nb(i).every(j=>!g[j]))){cells.forEach(i=>g[i]=ships.length+1);ships.push({cells,hp:n});pl=true}}if(!pl){ok=false;break}}if(ok)return{g,ships}}}
@@ -819,4 +885,17 @@ document.addEventListener("click",e=>{const c=e.target.closest("[data-bs]");if(c
  if(d.p=="ma"){if(!RG||!RG.s)return;if(RG.host)mAct(UID,d.k);else rgTx({t:"act",u:UID,a:d.k})}
  if(d.p=="bsz"&&BS&&!BS.rdy){BS.my=bsFleet();draw()}
  if(d.p=="bsr"&&BS&&!BS.rdy){BS.rdy=true;if(!BS.bot)rgTx({t:"rdy"});bsStart();draw()}});
+
+/* ===== v9: чат на весь экран ===== */
+document.head.insertAdjacentHTML("beforeend",`<style>
+@keyframes cfi{from{opacity:0;transform:translateX(24px)}}
+.chatfs{position:fixed;top:0;left:0;right:0;height:100dvh;max-width:560px;margin:0 auto;z-index:25;display:flex;flex-direction:column;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 8px) 12px calc(env(safe-area-inset-bottom,0px) + 10px);animation:cfi .35s var(--sp) both!important}
+.chh{display:flex;align-items:center;gap:10px;padding:4px 2px}
+.chatfs #ml{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:8px 2px 12px;-webkit-overflow-scrolling:touch}
+.chatfs .cmp{position:relative;bottom:auto;margin-top:6px;flex:none}
+.chatfs #vbn{margin:0 0 4px}
+body.chatfull nav{display:none!important}
+body.chatfull .vpill{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);left:50%;transform:translateX(-50%)}
+</style>`);
+const _d10=draw;draw=function(){_d10();document.body.classList.toggle("chatfull",tab=="fam");if(tab=="fam"&&$("#ml"))updMsgs()};
 </script></body></html>
