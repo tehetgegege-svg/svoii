@@ -218,7 +218,7 @@ document.addEventListener("click",e=>{
 document.addEventListener("input",e=>{const k=e.target.dataset.r;if(k){S.me[k]=+e.target.value;save();clearTimeout(window._t);window._t=setTimeout(draw,250)}});
 document.addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.id=="mt")document.querySelector("[data-a=send]").click();if((e.ctrlKey||e.metaKey)&&"cxsup".includes(e.key.toLowerCase())&&e.target.tagName!="INPUT")e.preventDefault()});
 /* друзья живут своей жизнью */
-setInterval(()=>{if(!S.me.name)return;const f=rnd(S.friends),k=rnd(Object.keys(ST));f.status=k;f.txt=k=="coffee"?"Хочу кофе":"";f.pod_pct=Math.max(5,f.pod_pct-(Math.random()*8|0));if(tab=="home"&&!document.activeElement?.id)draw()},30000);
+setInterval(()=>{if(!S.me.name||window.ONLINE)return;const f=rnd(S.friends),k=rnd(Object.keys(ST));f.status=k;f.txt=k=="coffee"?"Хочу кофе":"";f.pod_pct=Math.max(5,f.pod_pct-(Math.random()*8|0));if(tab=="home"&&!document.activeElement?.id)draw()},30000);
 net();draw();setTimeout(()=>{const s=$("#splash");s.style.opacity=0;setTimeout(()=>s.remove(),500)},1400);
 
 </script><script>
@@ -231,7 +231,7 @@ function cab(){const m=S.me,r=calcR(),c=r.c;
  return`<div class="card" style="text-align:center"><div class="av big" style="background:${m.avatar?`url(${m.avatar}) center/cover`:`linear-gradient(135deg,hsl(${m.color},80%,60%),hsl(${m.color+50},80%,55%))`}">${m.avatar?"":E((m.name||"?")[0].toUpperCase())}<label for="af">${ic("plus",18)}</label><input id="af" type="file" accept="image/*" hidden></div>
  <input class="nmi" data-p="name" value="${E(m.name)}" maxlength="20"><div class="m" style="margin-bottom:12px">${ST[m.status][0]}</div>
  <div class="chips" style="justify-content:center">${Object.entries(ST).map(([k,v])=>`<span class="chip ${m.status==k?"on":""}" data-a="st" data-k="${k}">${ic(v[2],16)}${v[0]}</span>`).join("")}</div>
- <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"></div>
+ <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"><div class="m" style="margin-top:14px">${m.code?"Мой код для друзей: <b>"+E(m.code)+"</b>":""}</div><button class="g s" data-p="out" style="margin-top:10px">Выйти</button></div>
  <div class="card"><h3>${ic("coin",16)} Калькулятор расходов</h3>
  <div class="chips" style="margin-bottom:12px">${CUR.map(x=>`<span class="chip ${c.cur==x?"on":""}" data-p="cur" data-k="${x}">${x}</span>`).join("")}</div>
  <div class="m">Зарплата</div><input data-p="sal" type="number" inputmode="decimal" placeholder="0" value="${c.sal||""}" style="margin:6px 0 12px;font-size:20px;font-weight:700">
@@ -333,4 +333,73 @@ document.addEventListener("click",e=>{const x=e.target.closest("[data-dk]");if(!
  if(d=="t"&&g.sel){const t=g.table[+x.dataset.i];if(beats(g,t.a,g.sel))dkBeat(t,g.sel);else toast("Эта карта не бьёт")}
  if(d=="pass"&&g.ph=="t"&&g.table.length)dkPass(0);
  if(d=="take"&&g.ph=="d")dkTake()});
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script><script>
+/* ===== ОНЛАЙН: Supabase (вход, друзья, чаты, уведомления) ===== */
+const SB_URL="https://esufgvqshmlvlavjigbd.supabase.co",SB_KEY="sb_publishable_QOobqNoQ98h_IZJV_Ez8LA_1Dj_GocM";
+let sb=null,UID=null,REQ=[],LOADED={},lastP="",AM="in";const PROF={};
+try{sb=supabase.createClient(SB_URL,SB_KEY)}catch(e){}
+document.head.insertAdjacentHTML("beforeend",`<style>#auth{position:fixed;inset:0;z-index:98;background:radial-gradient(120% 60% at 50% -10%,#3b2a7a88,transparent),var(--bg);display:grid;place-items:center;padding:20px;transition:opacity .5s,transform .5s var(--sp);overflow:auto}#auth.out{opacity:0;transform:scale(1.04);pointer-events:none}#auth h1{font-size:52px;margin:0 0 4px;letter-spacing:-2px;text-align:center;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;color:transparent}#aerr{color:var(--r);font-size:13px;min-height:18px;margin-top:10px;text-align:center}body.on [data-a=nfam]{display:none}</style>`);
+document.body.insertAdjacentHTML("beforeend",`<div id="auth"><div style="width:100%;max-width:380px"><h1>Свои</h1><div class="m" style="text-align:center;margin-bottom:18px">Только для своих</div><div class="card" style="margin:0"><div class="chips" style="margin-bottom:14px;justify-content:center"><span class="chip on" id="tin">Вход</span><span class="chip" id="tup">Регистрация</span></div><input id="an" placeholder="Как тебя зовут?" maxlength="20" style="display:none;margin-bottom:10px"><input id="ae" type="email" placeholder="Почта" autocomplete="email" style="margin-bottom:10px"><input id="ap" type="password" placeholder="Пароль (от 6 символов)" autocomplete="current-password"><button id="ab" style="width:100%;margin-top:14px">Войти</button><div id="aerr"></div></div></div></div>`);
+const aerr=t=>$("#aerr").textContent=t||"";
+function amode(m){AM=m;$("#tin").classList.toggle("on",m=="in");$("#tup").classList.toggle("on",m=="up");$("#an").style.display=m=="up"?"block":"none";$("#ab").textContent=m=="up"?"Создать аккаунт":"Войти";aerr()}
+$("#tin").onclick=()=>amode("in");$("#tup").onclick=()=>amode("up");
+const RU={"Invalid login credentials":"Неверная почта или пароль","User already registered":"Эта почта уже зарегистрирована"};
+async function authGo(){if(!sb)return aerr("Не загрузился сервер. Проверь интернет");const e=$("#ae").value.trim(),p=$("#ap").value,n=$("#an").value.trim();aerr();
+ if(!e||p.length<6)return aerr("Нужна почта и пароль от 6 символов");if(AM=="up"&&!n)return aerr("Как тебя зовут?");
+ $("#ab").disabled=true;let r;try{r=AM=="up"?await sb.auth.signUp({email:e,password:p,options:{data:{name:n}}}):await sb.auth.signInWithPassword({email:e,password:p})}catch(x){r={error:{message:"Нет связи с сервером"}}}
+ $("#ab").disabled=false;if(r.error)return aerr(RU[r.error.message]||r.error.message);
+ if(!r.data.session)return aerr("Нужно подтвердить почту — или выключи Confirm email в Supabase");boot(r.data.user,n)}
+$("#ab").onclick=authGo;$("#ap").onkeydown=e=>{if(e.key=="Enter")authGo()};
+async function nm(id){if(!PROF[id]){const{data}=await sb.from("profiles").select("id,name,color,avatar,status,txt").eq("id",id).maybeSingle();if(data)PROF[id]=data}return PROF[id]?.name||"?"}
+const dm=id=>"dm:"+[UID,id].sort().join("_");
+async function boot(u,n){UID=u.id;let{data:p}=await sb.from("profiles").select("*").eq("id",UID).maybeSingle();
+ if(!p){const r=await sb.from("profiles").insert({id:UID,name:n||u.user_metadata?.name||u.email.split("@")[0],color:Math.random()*360|0}).select().single();p=r.data}
+ if(!p)return aerr("Профиль не создался — выполнил SQL из шага 3?");
+ window.ONLINE=true;document.body.classList.add("on");Object.assign(S.me,{name:p.name,color:p.color,status:p.status||"free",txt:p.txt||"",avatar:p.avatar||S.me.avatar,code:p.code});
+ S.invites=[];S.msgs={};S.friends=[];S.fams=[];LOADED={};PROF[UID]=p;
+ sb.channel("svoi").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},x=>onMsg(x.new))
+ .on("postgres_changes",{event:"INSERT",schema:"public",table:"notifications",filter:`user_id=eq.${UID}`},x=>onNote(x.new))
+ .on("postgres_changes",{event:"*",schema:"public",table:"friendships"},()=>loadFriends())
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"profiles"},x=>{const f=S.friends.find(y=>y.id==x.new.id);if(f){Object.assign(f,{name:x.new.name,color:x.new.color,avatar:x.new.avatar,status:ST[x.new.status]?x.new.status:"free",txt:x.new.txt||""});PROF[f.id]=x.new;if(tab=="home"&&!document.activeElement?.id)draw()}}).subscribe();
+ await loadFriends();$("#auth").classList.add("out");setTimeout(()=>$("#auth").remove(),600);
+ const{data:nn}=await sb.from("notifications").select("*").eq("seen",false).order("ts").limit(20);(nn||[]).forEach(onNote)}
+async function loadFriends(){const{data:fr}=await sb.from("friendships").select("*");const L=fr||[],ids=[...new Set(L.flatMap(x=>[x.from_id,x.to_id]).filter(i=>i!=UID))];
+ const{data:pr}=ids.length?await sb.from("profiles").select("id,name,color,avatar,status,txt").in("id",ids):{data:[]};(pr||[]).forEach(p=>PROF[p.id]=p);
+ const P=id=>PROF[id]||{id,name:"?",color:200};
+ S.friends=L.filter(x=>x.state=="accepted").map(x=>{const p=P(x.from_id==UID?x.to_id:x.from_id);return{...p,status:ST[p.status]?p.status:"free",txt:p.txt||"",pod_pct:0,iq_sticks:0,show_pod:0,show_iq:0}});
+ REQ=L.filter(x=>x.state=="pending"&&x.to_id==UID).map(x=>({...P(x.from_id),fid:x.id}));
+ S.fams=S.friends.map(f=>({id:dm(f.id),name:f.name,members:[f.id],status:""}));save();draw()}
+async function loadMsgs(r){const{data}=await sb.from("messages").select("*").eq("room",r).order("ts",{ascending:false}).limit(50);const L=(data||[]).reverse();
+ await Promise.all([...new Set(L.map(m=>m.sender))].filter(i=>i!=UID).map(nm));S.msgs[r]=L.map(m=>({id:m.id,f:m.sender==UID?"me":m.sender,body:m.body,ts:m.ts}));if(tab=="fam"&&room==r)updMsgs()}
+async function onMsg(r){const L=S.msgs[r.room]=S.msgs[r.room]||[];if(L.some(x=>x.id==r.id))return;L.push({id:r.id,f:r.sender==UID?"me":r.sender,body:r.body,ts:r.ts});
+ const n=r.sender==UID?"":await nm(r.sender);if(tab=="fam"&&room==r.room)updMsgs();else if(r.sender!=UID)toast(n+": "+r.body.slice(0,40))}
+function onNote(n){const d=n.data||{};toast(d.text||"Новое уведомление");
+ if(n.kind=="invite"&&d.from){S.invites.unshift({id:Date.now(),kind:d.kind,from:d.from,ts:Date.now(),r:{}});save();if(tab=="home")draw()}
+ if(n.kind=="reply"){const i=S.invites.find(x=>x.from=="me");if(i){i.r[d.from]=d.answer;save();if(tab=="home")draw()}}
+ sb.from("notifications").update({seen:true}).eq("id",n.id).then(()=>{})}
+updMsgs=function(){const el=$("#ml");if(!el)return;const ms=S.msgs[room]||[];el.innerHTML=ms.slice(-50).map(m=>{const me=m.f=="me";return`<div class="msg ${me?"me":""}"><small>${E(me?S.me.name:PROF[m.f]?.name||F(m.f).name)}</small>${E(m.body)}</div>`}).join("")||'<div class="m">Пока тихо…</div>';$("#v").scrollTop=1e9};
+const _bs=botSay;botSay=function(r){if(!window.ONLINE)_bs(r)};
+const _si=sendInvite;sendInvite=function(kind){if(!window.ONLINE)return _si(kind);S.invites.unshift({id:Date.now(),kind,from:"me",ts:Date.now(),r:{}});if(kind!="smoke")S.me.status=kind;save();draw();
+ if(!S.friends.length)return toast("Сначала добавь друзей");
+ sb.from("notifications").insert(S.friends.map(f=>({user_id:f.id,kind:"invite",data:{kind,from:UID,text:S.me.name+" зовёт: "+KIND[kind][0]}}))).then(()=>{});toast("Позвал друзей: "+S.friends.length)};
+const _h=home;home=function(){const q=REQ.map(r=>`<div class="card" style="border-color:var(--a)"><div class="row">${av(r)}<div class="f1"><b>${E(r.name)}</b><div class="m">хочет дружить</div></div><button class="s" data-p="fa" data-k="${r.fid}">${ic("check",15)}</button><button class="g s" data-p="fd" data-k="${r.fid}">${ic("x",15)}</button></div></div>`).join("");return q+_h()};
+const _d2=draw;draw=function(){_d2();if(!window.ONLINE||!S.me.name)return;if(tab=="fam"){if(!LOADED[room]){LOADED[room]=1;loadMsgs(room)}if(room!="all"){const fs=$("#fs");if(fs){const r=fs.parentElement;r.previousElementSibling?.remove();r.remove()}}}};
+setInterval(async()=>{if(!UID)return;const m=S.me,o={name:m.name,color:m.color,avatar:m.avatar||null,status:m.status,txt:m.txt},j=JSON.stringify(o);if(j==lastP)return;const{error}=await sb.from("profiles").update(o).eq("id",UID);if(!error)lastP=j},2500);
+function addModal(){const d=document.createElement("div");d.style.cssText="position:fixed;inset:0;z-index:60;background:#000a;display:grid;place-items:center;padding:18px";
+ d.innerHTML=`<div class="card" style="width:100%;max-width:380px;margin:0"><h3>${ic("users",16)} Добавить друга</h3><div class="m">Твой код — отправь его другу:</div><div style="font-size:34px;font-weight:800;letter-spacing:4px;margin:8px 0 16px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;color:transparent">${E(S.me.code||"")}</div><input id="fc2" placeholder="Код друга" maxlength="6" style="text-transform:uppercase"><div class="row" style="margin-top:12px"><button id="fgo" class="f1">Добавить</button><button class="g" id="fx">Закрыть</button></div><div class="m" id="fm2" style="margin-top:10px;min-height:18px"></div></div>`;
+ document.body.appendChild(d);const say=t=>d.querySelector("#fm2").textContent=t;d.querySelector("#fx").onclick=()=>d.remove();
+ d.querySelector("#fgo").onclick=async()=>{const c=d.querySelector("#fc2").value.trim().toUpperCase();if(!c)return;if(c==S.me.code)return say("Это твой собственный код");
+  const{data:p}=await sb.from("profiles").select("id,name").eq("code",c).maybeSingle();if(!p)return say("Такого кода нет");
+  const{error}=await sb.from("friendships").insert({from_id:UID,to_id:p.id});if(error)return say(error.code=="23505"?"Заявка уже отправлена":"Не получилось: "+error.message);
+  sb.from("notifications").insert({user_id:p.id,kind:"friend",data:{text:S.me.name+" хочет дружить"}}).then(()=>{});say("Заявка отправлена: "+p.name);loadFriends()}}
+document.addEventListener("click",e=>{if(!window.ONLINE)return;
+ if(e.target.closest("[data-a=nf]")){e.stopImmediatePropagation();addModal();return}
+ const a=e.target.closest("[data-a=send]");if(a){e.stopImmediatePropagation();const i=$("#mt"),b=i.value.trim();if(!b)return;i.value="";
+  sb.from("messages").insert({room,sender:UID,body:b}).select().single().then(r=>r.error?toast("Не отправилось"):onMsg(r.data))}},true);
+document.addEventListener("click",async e=>{if(!window.ONLINE)return;const r=e.target.closest("[data-a=rep]");if(r){const i=S.invites.find(x=>x.id==+r.dataset.i);if(i&&i.from!="me")sb.from("notifications").insert({user_id:i.from,kind:"reply",data:{from:UID,answer:r.dataset.k,text:S.me.name+": "+ANS[r.dataset.k][0]}}).then(()=>{})}
+ const x=e.target.closest("[data-p]");if(!x)return;const d=x.dataset;
+ if(d.p=="fa"){const q=REQ.find(y=>y.fid==d.k);await sb.from("friendships").update({state:"accepted"}).eq("id",+d.k);if(q)sb.from("notifications").insert({user_id:q.id,kind:"friend",data:{text:S.me.name+" принял твою заявку"}}).then(()=>{});toast("Теперь вы друзья");loadFriends()}
+ if(d.p=="fd"){await sb.from("friendships").delete().eq("id",+d.k);loadFriends()}
+ if(d.p=="out"){await sb.auth.signOut();try{localStorage.removeItem(KEY)}catch(x){}location.reload()}});
+if(sb)sb.auth.getSession().then(({data})=>{if(data.session)boot(data.session.user)});else aerr("Не загрузился сервер. Проверь интернет");
 </script></body></html>
