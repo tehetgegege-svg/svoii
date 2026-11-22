@@ -998,4 +998,158 @@ function getLsm2(){return getLsm()}
 const _d11=draw;draw=function(){if(tab!="fam")CO=false;_d11();const L=tab=="rest"&&((GM=="mono"&&RG&&RG.s)||(GM=="bs"&&BS)),G=tab=="rest"&&((GM=="ck"&&S.ck)||(GM=="cards"&&S.cg));
  document.body.classList.toggle("lscfull",!!L);document.body.classList.toggle("gfull",!!(L||G));if(window.ONLINE&&!PVL&&UID){PVL=1;loadPV()}};
 addEventListener("resize",()=>{if(document.body.classList.contains("gfull"))draw()});
+/* ===== v11: музыка (SoundCloud / YouTube / Spotify), совместное прослушивание ===== */
+document.head.insertAdjacentHTML("beforeend",`<style>
+.mbtn{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 94px);z-index:50;width:50px;height:50px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;font-size:22px;color:#fff;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 26px -6px color-mix(in srgb,var(--b) 80%,transparent);transition:transform .45s var(--bounce)}
+.mbtn:active{transform:scale(.88)}.mbtn.pl{animation:mgl 1.8s ease-in-out infinite}@keyframes mgl{50%{transform:scale(1.1);box-shadow:0 0 0 8px #ffffff18,0 10px 26px -6px var(--b)}}
+.mbtn .dot2{position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;background:#ef4444;border:2px solid var(--bg)}
+body.chatfull .mbtn{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;width:42px;height:42px;font-size:18px}
+body.gfull .mbtn{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 10px);right:auto;left:50%;margin-left:-21px;width:42px;height:42px;font-size:18px}body.lscfull .mbtn{display:none}
+.mbk{position:fixed;inset:0;z-index:74;background:#0008;opacity:0;pointer-events:none;transition:opacity .35s}.mbk.on{opacity:1;pointer-events:auto}
+.mpan{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;z-index:75;transform:translateY(108%);transition:transform .55s var(--sp);border-radius:32px 32px 0 0;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--c) 94%,transparent);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 -20px 60px -20px #000;max-height:92dvh;overflow:auto}.mpan.on{transform:none}
+#mpl{margin:12px 0;border-radius:16px;overflow:hidden;min-height:0}
+</style>`);
+const LS={};function ls(src,g){return LS[src]||(LS[src]=new Promise(r=>{if(g=="YT"){if(window.YT&&YT.Player)return r();window.onYouTubeIframeAPIReady=()=>r()}const s=document.createElement("script");s.src=src;if(g!="YT")s.onload=()=>r();document.head.appendChild(s)}))}
+const MU={cur:null,w:null,room:null,ch:null,playing:false,mute:false,inv:[]};
+const mParse=u=>{u=(u||"").trim();let m;if(/soundcloud\.com\//.test(u))return{k:"sc",url:u};if(m=u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/))return{k:"yt",id:m[1],url:"https://youtu.be/"+m[1]};if(m=u.match(/open\.spotify\.com\/(track|album|playlist|episode|artist)\/(\w+)/))return{k:"sp",t:m[1],id:m[2],url:u};return null};
+const mTx=m=>MU.ch&&MU.ch.send({type:"broadcast",event:"m",payload:m});
+const mPos=cb=>{const w=MU.w;if(!w)return cb(0);if(w.k=="sc")w.w.getPosition(ms=>cb(ms/1000));else cb(w.w.getCurrentTime?w.w.getCurrentTime():0)};
+const mSeek=s=>{const w=MU.w;if(!w)return;if(w.k=="sc")w.w.seekTo(s*1000);else w.w.seekTo(s,true)};
+const mPlay=()=>{const w=MU.w;if(!w)return;w.k=="sc"?w.w.play():w.w.playVideo()},mPause=()=>{const w=MU.w;if(!w)return;w.k=="sc"?w.w.pause():w.w.pauseVideo()};
+function mEv(t){MU.playing=t=="play";$("#mbtn")?.classList.toggle("pl",MU.playing);if(MU.mute)return;mPos(pos=>mTx({t,pos}))}
+async function mLoad(p){MU.cur=p;MU.w=null;const box=$("#mpl");if(!box)return;box.innerHTML="";MU.playing=false;
+ if(p.k=="sc"){box.innerHTML=`<iframe id="mif" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(p.url)}&auto_play=false&hide_related=true&show_comments=false&show_teaser=false&visual=false" allow="autoplay" style="width:100%;height:166px;border:0"></iframe>`;await ls("https://w.soundcloud.com/player/api.js","SC");const w=SC.Widget($("#mif"));MU.w={k:"sc",w};w.bind(SC.Widget.Events.PLAY,()=>mEv("play"));w.bind(SC.Widget.Events.PAUSE,()=>mEv("pause"))}
+ else if(p.k=="yt"){box.innerHTML='<div id="myt"></div>';await ls("https://www.youtube.com/iframe_api","YT");MU.w={k:"yt",w:new YT.Player("myt",{width:"100%",height:210,videoId:p.id,playerVars:{playsinline:1,rel:0},events:{onStateChange:e=>{if(e.data==1)mEv("play");if(e.data==2)mEv("pause")}}})}}
+ else box.innerHTML=`<iframe src="https://open.spotify.com/embed/${p.t}/${p.id}" allow="autoplay; encrypted-media" style="width:100%;height:152px;border:0"></iframe>`;
+ S.mh=[{url:p.url,k:p.k},...(S.mh||[]).filter(x=>x.url!=p.url)].slice(0,8);save();mUI()}
+const dly=ms=>new Promise(r=>setTimeout(r,ms));
+async function mMsg(m){if(m.t=="hello"&&MU.cur&&MU.w){mPos(pos=>mTx({t:"state",p:MU.cur,playing:MU.playing,pos}));return}
+ MU.mute=true;setTimeout(()=>MU.mute=false,1500);
+ if(m.t=="load"||m.t=="state"){if(!MU.cur||MU.cur.url!=m.p.url)await mLoad(m.p);if(m.t=="state"&&m.playing){await dly(1300);MU.mute=true;mSeek(m.pos+.8);mPlay();setTimeout(()=>MU.mute=false,1500)}}
+ else if(m.t=="play"){mSeek(m.pos+.3);mPlay()}else if(m.t=="pause"){mPause();mSeek(m.pos)}}
+function mJoin(room){mLeave(true);MU.room=room;MU.ch=sb.channel("m_"+room).on("broadcast",{event:"m"},p=>mMsg(p.payload)).subscribe();setTimeout(()=>mTx({t:"hello"}),900);mUI()}
+function mLeave(q){if(MU.ch)sb.removeChannel(MU.ch);MU.ch=null;MU.room=null;if(!q)mUI()}
+const mName=room=>{const f=S.fams.find(x=>x.id==room);return f?f.name:"Общий чат"};
+function mUI(){const c=$("#mlis");if(!c)return;const cur=MU.cur;
+ c.innerHTML=(MU.inv.length?MU.inv.map((v,i)=>`<div class="fi"><div class="row">${mini(PROF[v.from]||{name:"?",color:200},40)}<div class="f1"><b>${E(PROF[v.from]?.name||"Друг")}</b><div class="m">зовёт слушать музыку</div></div><button class="s" data-mu="join" data-k="${i}">Слушать</button></div></div>`).join(""):"")
+ +(MU.room?`<div class="row sp" style="margin-top:10px"><span class="m">🎧 Слушаете вместе: <b>${E(mName(MU.room))}</b></span><button class="g s" data-mu="leave">Выйти</button></div>`
+  :cur&&cur.k!="sp"&&S.friends.length?`<div class="m" style="margin:12px 0 8px">Слушать вместе с:</div><div class="sc">${S.friends.map(f=>`<span class="chip" data-mu="with" data-k="${f.id}">${mini(f,22)}${E(f.name)}</span>`).join("")}<span class="chip" data-mu="with" data-k="all">💬 Общий чат</span></div>`:"")
+ +((S.mh||[]).length?`<div class="m" style="margin:14px 0 8px">Недавнее:</div><div class="sc">${S.mh.map((h,i)=>`<span class="chip" data-mu="hist" data-k="${i}">${{sc:"☁️ SoundCloud",yt:"▶️ YouTube",sp:"🟢 Spotify"}[h.k]} · ${E(h.url.replace(/^https?:\/\/(www\.)?/,"").slice(-16))}</span>`).join("")}</div>`:"");
+ const d=$("#mbtn i");if(d)d.hidden=!MU.inv.length}
+function ensureMusic(){if($("#mbtn"))return;document.body.insertAdjacentHTML("beforeend",`<button id="mbtn" class="mbtn" data-mu="open">🎵<i class="dot2" hidden></i></button><div id="mbk" class="mbk" data-mu="close"></div><div id="mpan" class="mpan"><div class="sh" style="margin:0 auto 12px"></div><div class="row sp"><b style="font-size:20px">🎵 Музыка</b><button class="g s" data-mu="close">Закрыть</button></div><div class="row" style="margin-top:12px"><input id="mu" placeholder="Ссылка SoundCloud, YouTube или Spotify" class="f1"><button data-mu="go">▶</button></div><div id="mpl"></div><div id="mlis"></div><div class="m" style="margin-top:12px;font-size:12px">Музыка играет, пока ты переписываешься и играешь. Вместе слушать можно SoundCloud и YouTube.</div></div>`);mUI()}
+const _on12=onNote;onNote=function(n){_on12(n);if(n.kind=="music"&&n.data?.room){MU.inv.unshift({room:n.data.room,p:n.data.p,from:n.data.from});nm(n.data.from).then(mUI)}};
+document.addEventListener("click",async e=>{const x=e.target.closest("[data-mu]");if(!x)return;const d=x.dataset;
+ if(d.mu=="open"){$("#mpan").classList.add("on");$("#mbk").classList.add("on");mUI()}
+ if(d.mu=="close"){$("#mpan").classList.remove("on");$("#mbk").classList.remove("on")}
+ if(d.mu=="go"){const p=mParse($("#mu").value);if(!p)return toast("Не понял ссылку. Нужна ссылка SoundCloud, YouTube или Spotify");$("#mu").value="";await mLoad(p);if(MU.ch)mTx({t:"load",p})}
+ if(d.mu=="hist"){const h=S.mh[+d.k],p=mParse(h.url);if(p){await mLoad(p);if(MU.ch)mTx({t:"load",p})}}
+ if(d.mu=="with"&&MU.cur){const room=d.k=="all"?"all":dm(d.k);mJoin(room);if(d.k!="all")sb.from("notifications").insert({user_id:d.k,kind:"music",data:{room,p:MU.cur,from:UID,text:S.me.name+" зовёт слушать музыку 🎧"}}).then(()=>{});toast("Зову слушать вместе")}
+ if(d.mu=="join"){const v=MU.inv.splice(+d.k,1)[0];if(v){mJoin(v.room);if(v.p)await mLoad(v.p)}}
+ if(d.mu=="leave")mLeave()});
+const _d12=draw;draw=function(){_d12();if(window.ONLINE)ensureMusic()};
+
+/* ===== v12: боты в дураке, стикеры/GIF/мемы/кружки, группы ===== */
+document.head.insertAdjacentHTML("beforeend",`<style>
+.stk{font-size:76px;line-height:1.05;animation:stk .6s var(--bounce) both;filter:drop-shadow(0 6px 8px #0004)}@keyframes stk{from{transform:scale(.2) rotate(-25deg);opacity:0}}
+.stt{font-weight:900;font-size:24px;letter-spacing:-.5px;padding:10px 16px;border-radius:18px;color:#fff;background:linear-gradient(135deg,hsl(var(--h),85%,58%),hsl(calc(var(--h) + 45),85%,48%));transform:rotate(-4deg);box-shadow:0 10px 20px -8px hsl(var(--h),85%,40%);animation:stk .6s var(--bounce) both}
+.bb.nb{background:none!important;padding:0 2px}.bb.nb em{color:var(--m)}.bb.nb small{opacity:.8}
+.vc{position:relative;width:200px;height:200px;border-radius:50%;overflow:hidden;cursor:pointer;background:#000;box-shadow:0 10px 24px -10px #000a;animation:stk .5s var(--bounce) both}.vc video{width:100%;height:100%;object-fit:cover;display:block}
+.vc i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:38px;color:#fff;background:#0003;transition:opacity .2s}.vc.pl i{opacity:0}.vc span{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:11px;background:#0008;color:#fff;padding:2px 8px;border-radius:10px}
+.csov{position:fixed;inset:0;z-index:72;background:#0008;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}.csov.on{opacity:1;pointer-events:auto}
+.cspn{width:100%;max-width:520px;margin:0 auto;border-radius:32px 32px 0 0;background:color-mix(in srgb,var(--c) 96%,transparent);backdrop-filter:blur(24px);padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:80dvh;overflow:auto;animation:up .45s var(--sp) both}
+.cgr{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ct{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 4px;border-radius:22px;font-size:13px;font-weight:600;background:var(--c2);cursor:pointer;transition:transform .4s var(--bounce)}.ct:active{transform:scale(.92)}.ct b{font-size:32px;font-weight:400}
+.skg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.skg span{font-size:38px;text-align:center;padding:6px 0;border-radius:14px;cursor:pointer;transition:transform .3s var(--bounce)}.skg span:active{transform:scale(1.3)}
+.skt{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.skt span{text-align:center;font-weight:800;padding:12px 6px;border-radius:14px;color:#fff;background:linear-gradient(135deg,hsl(var(--h),85%,58%),hsl(calc(var(--h) + 45),85%,48%));cursor:pointer}
+.gfg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.gfg img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;cursor:pointer;background:var(--c2)}
+.ccov{position:fixed;inset:0;z-index:90;background:#000d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;animation:fade .25s both}
+.ccv{position:relative;width:min(72vw,300px);aspect-ratio:1}.ccv video{width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scaleX(-1)}.ccv svg{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);transform:rotate(-90deg)}.ccv circle{fill:none;stroke-width:5;stroke-linecap:round}
+.mq2{width:100%;border-radius:16px;background:#222}
+</style>`);
+let DKB=0,DKN=2,GRP=[],GL=0,GERR=0,GKEY="";try{GKEY=localStorage.getItem("gk")||""}catch(e){}
+/* ---------- карты с ботами ---------- */
+dkNew=function(){const fr=DKB?[]:S.friends.filter(f=>PICK.has(f.id)).slice(0,3),dk=[];for(const s of"♠♥♦♣")for(const r of RK)dk.push(r+s);sh(dk);
+ const BN=["Макс","Лиза","Тимур"],bots=Array.from({length:DKB},(_,i)=>{PROF["bot"+i]={id:"bot"+i,name:"Бот "+BN[i],color:[20,150,330][i]};return{id:"bot"+i,name:"Бот "+BN[i],hand:[]}});
+ const pl=[{id:"me",name:S.me.name,hand:[]},...fr.map(f=>({id:f.id,name:f.name,hand:[]})),...bots];pl.forEach(p=>p.hand=dk.splice(0,6));
+ const tc=dk[dk.length-1],ts=su(tc);let a=0,best=99;pl.forEach((p,i)=>p.hand.forEach(c=>{if(su(c)==ts&&rv(c)<best){best=rv(c);a=i}}));
+ const g={dur:1,pl,deck:dk,trump:ts,tc,att:a,table:[],ph:"t",ti:0,pass:[],taking:false,lim:6,st:{},sel:null,over:null,who:a,k:0};g.lim=Math.min(6,pl[dkDef(g)].hand.length);S.cg=g;save();setTimeout(dkStep,300)};
+/* ---------- стикеры, GIF, мемы, кружки ---------- */
+const SK={"Эмоции":"😂 🤣 😍 🥰 😎 🤯 🥳 😭 😡 🤔 🙄 😴 🤡 💀 👻 😈 🫡 🤝 🙏 💪 🔥 💯 ❤️ 💔 ✨ 🎉 👍 👎 👀 🙈".split(" "),"Звери":"🐶 🐱 🐸 🐵 🦄 🐼 🐧 🦊 🐷 🐔 🦆 🐙 🦖 🐢 🐻 🐰 🦁 🐯 🦉 🐝".split(" "),"Еда":"🍕 🍔 🍟 🌮 🍣 🍩 🍺 ☕ 🍷 🍿 🥑 🍉 🍪 🍫 🥂".split(" "),"Мемы":"🗿 🫠 🤌 🥶 🤮 🫣 😮‍💨 🧠 🤏 💅 🤪 😏 🥴 🤓 😤".split(" ")};
+const SKT=["ЖЁСТКО","РЖУ","ОК","БАЗА","ПОГНАЛИ","НЕ ВАЖНО","СПАСИБО","ГДЕ ТЫ?","ПОЗВОНИ","ХАХА","КРИНЖ","ТОП","ПРИВЕТ","ПОКА"];
+const sendRaw=async body=>{const r=await sb.from("messages").insert({room,sender:UID,body}).select().single();if(r.error)return toast("Не отправилось");onMsg(r.data)};
+async function upMedia(blob,ext,type){const path=`${UID}/${Date.now()}.${ext}`,{error}=await sb.storage.from("media").upload(path,blob,{contentType:type});if(error){toast("Не загрузилось: "+error.message);return null}return sb.storage.from("media").getPublicUrl(path).data.publicUrl}
+const _mb2=mBody;mBody=function(m){const b=m.body||"";
+ if(b.startsWith("stk:")){const q=b.match(/^stk:(\w):(.*)$/)||[],v=q[2]||"";if(q[1]=="e")return`<div class="stk">${E(v)}</div>`;let h=0;for(const c of v)h=(h*7+c.charCodeAt(0))%360;return`<div class="stt" style="--h:${h}">${E(v)}</div>`}
+ if(b.startsWith("gif:")){const u=b.slice(4);return`<img class="mi" src="${E(u)}" data-img="${E(u)}" loading="lazy">`}
+ if(b.startsWith("vid:")){const[u,d]=b.slice(4).split("|");return`<div class="vc" data-vc><video src="${E(u)}#t=0.1" playsinline preload="metadata" loop></video><i>▶</i><span>${fmtD(+d||0)}</span></div>`}
+ return _mb2(m)};
+let CST="menu",SKP="Эмоции",MM={bg:0,img:null};
+const MBG=[["#8b6cff","#ff5f9e","🗿"],["#0ea5e9","#22c55e","🐸"],["#f59e0b","#ef4444","😎"],["#111827","#6b7280","💀"],["#ec4899","#f97316","🤡"],["#14b8a6","#6366f1","🧠"]];
+function csBody(t){const back='<div class="row sp" style="margin-bottom:12px"><button class="g s" data-cs="menu">‹ Назад</button><button class="g s" data-cs="close">Закрыть</button></div>';
+ if(t=="menu")return`<div class="cgr"><div class="ct" data-cs="photo"><b>📷</b>Фото</div><div class="ct" data-cs="stk"><b>😎</b>Стикеры</div><div class="ct" data-cs="gif"><b>🎞️</b>GIF</div><div class="ct" data-cs="meme"><b>🤪</b>Мем</div><div class="ct" data-cs="circle"><b>⭕</b>Кружок</div><div class="ct" data-cs="voice"><b>🎤</b>Голос</div></div>`;
+ if(t=="stk")return back+`<div class="sc" style="margin-bottom:10px">${[...Object.keys(SK),"Надписи"].map(k=>`<span class="chip ${SKP==k?"on":""}" data-cs="pack" data-k="${k}">${k}</span>`).join("")}</div>`+(SKP=="Надписи"?`<div class="skt">${SKT.map(x=>{let h=0;for(const c of x)h=(h*7+c.charCodeAt(0))%360;return`<span style="--h:${h}" data-cs="send" data-b="stk:t:${x}">${x}</span>`}).join("")}</div>`:`<div class="skg">${SK[SKP].map(x=>`<span data-cs="send" data-b="stk:e:${x}">${x}</span>`).join("")}</div>`);
+ if(t=="gif")return back+(GKEY?`<div class="row"><input id="gq" class="f1" placeholder="Поиск GIF (на английском лучше)"><button data-cs="gs">🔍</button></div><div class="gfg" id="gfg"></div>`:`<div class="m" style="margin-bottom:8px">Вставь ссылку на GIF:</div><div class="row"><input id="gu" class="f1" placeholder="https://…/файл.gif"><button data-cs="gurl">➤</button></div><button class="g" data-cs="gfile" style="width:100%;margin-top:10px">📁 Выбрать GIF с телефона</button><div class="m" style="margin:14px 0 8px;font-size:12px">Чтобы искать GIF прямо здесь, вставь свой бесплатный ключ GIPHY (developers.giphy.com):</div><div class="row"><input id="gk" class="f1" placeholder="Ключ GIPHY"><button class="g" data-cs="gkey">OK</button></div>`);
+ if(t=="meme"){const m=MBG[MM.bg];return back+`<canvas id="mcv" width="600" height="600" class="mq2"></canvas><div class="sc" style="margin:10px 0">${MBG.map((x,i)=>`<span class="chip ${MM.bg==i&&!MM.img?"on":""}" data-cs="mbg" data-k="${i}">${x[2]}</span>`).join("")}<span class="chip" data-cs="mpic">📷 Своё фото</span></div><input id="mtop" placeholder="Верхний текст" style="margin-bottom:8px"><input id="mbot" placeholder="Нижний текст" style="margin-bottom:12px"><button data-cs="msend" style="width:100%">Отправить мем</button><input id="mfile" type="file" accept="image/*" hidden>`}return back}
+function csOpen(t){let o=$("#cs");if(!o){o=document.createElement("div");o.id="cs";o.className="csov";document.body.appendChild(o);o.addEventListener("click",csClick)}CST=t;o.innerHTML=`<div class="cspn"><div class="sh" style="margin:0 auto 12px"></div>${csBody(t)}</div>`;o.classList.add("on");if(t=="meme")memeDraw();if(t=="gif"&&GKEY)gifSearch("")}
+const csClose=()=>{const o=$("#cs");if(o)o.classList.remove("on")};
+function memeDraw(){const c=$("#mcv");if(!c)return;const x=c.getContext("2d"),m=MBG[MM.bg];x.clearRect(0,0,600,600);
+ if(MM.img){const im=MM.img,z=Math.max(600/im.width,600/im.height);x.drawImage(im,(600-im.width*z)/2,(600-im.height*z)/2,im.width*z,im.height*z)}else{const g=x.createLinearGradient(0,0,600,600);g.addColorStop(0,m[0]);g.addColorStop(1,m[1]);x.fillStyle=g;x.fillRect(0,0,600,600);x.font="320px serif";x.textAlign="center";x.textBaseline="middle";x.fillText(m[2],300,310)}
+ const tx=(t,y)=>{t=(t||"").toUpperCase();if(!t)return;let f=64;x.textAlign="center";x.textBaseline="middle";do{x.font=`900 ${f}px Impact,"Arial Black",sans-serif`;f-=3}while(x.measureText(t).width>570&&f>16);x.lineWidth=f/5+3;x.strokeStyle="#000";x.lineJoin="round";x.strokeText(t,300,y);x.fillStyle="#fff";x.fillText(t,300,y)};
+ tx($("#mtop")?.value,56);tx($("#mbot")?.value,544)}
+async function gifSearch(q){const g=$("#gfg");if(!g)return;try{const u=q?`https://api.giphy.com/v1/gifs/search?api_key=${GKEY}&q=${encodeURIComponent(q)}&limit=24&lang=ru`:`https://api.giphy.com/v1/gifs/trending?api_key=${GKEY}&limit=24`,r=await(await fetch(u)).json();g.innerHTML=(r.data||[]).map(d=>`<img src="${d.images.fixed_height_small.url}" data-cs="send" data-b="gif:${d.images.fixed_height.url}">`).join("")||'<div class="m">Ничего не нашлось</div>'}catch(e){g.innerHTML='<div class="m">Не получилось загрузить. Проверь ключ</div>'}}
+async function csClick(e){const x=e.target.closest("[data-cs]");if(!x){if(e.target.id=="cs")csClose();return}const d=x.dataset,a=d.cs;
+ if(a=="close")return csClose();if(["menu","stk","gif","meme"].includes(a))return csOpen(a);
+ if(a=="pack"){SKP=d.k;return csOpen("stk")}
+ if(a=="send"){csClose();return sendRaw(d.b)}
+ if(a=="photo"){csClose();return $("#pf").click()}
+ if(a=="voice"){csClose();return recStart()}
+ if(a=="circle"){csClose();return ccStart()}
+ if(a=="gs")return gifSearch($("#gq").value.trim());
+ if(a=="gurl"){const u=$("#gu").value.trim();if(!/^https?:\/\//.test(u))return toast("Нужна ссылка на GIF");csClose();return sendRaw("gif:"+u)}
+ if(a=="gfile"){const i=document.createElement("input");i.type="file";i.accept="image/gif";i.onchange=async()=>{const f=i.files[0];if(!f)return;csClose();toast("Отправляю…");const u=await upMedia(f,"gif","image/gif");if(u)sendRaw("gif:"+u)};return i.click()}
+ if(a=="gkey"){const k=$("#gk").value.trim();if(k){GKEY=k;try{localStorage.setItem("gk",k)}catch(e){}csOpen("gif")}}
+ if(a=="mbg"){MM.bg=+d.k;MM.img=null;return memeDraw()}
+ if(a=="mpic")return $("#mfile").click();
+ if(a=="msend"){const c=$("#mcv");c.toBlob(async b=>{csClose();toast("Отправляю…");const u=await upMedia(b,"jpg","image/jpeg");if(u)sendRaw("img:"+u)},"image/jpeg",.85)}}
+document.addEventListener("input",e=>{if(e.target.id=="mtop"||e.target.id=="mbot")memeDraw()});
+document.addEventListener("change",e=>{if(e.target.id=="mfile"&&e.target.files[0]){const im=new Image();im.onload=()=>{MM.img=im;memeDraw()};im.src=URL.createObjectURL(e.target.files[0])}
+ else if(e.target.id=="pf"&&e.target.files[0]&&e.target.files[0].type=="image/gif"){e.stopImmediatePropagation();const f=e.target.files[0];e.target.value="";toast("Отправляю…");upMedia(f,"gif","image/gif").then(u=>u&&sendRaw("gif:"+u))}},true);
+document.addEventListener("click",e=>{if(e.target.closest("[data-csopen]")){csOpen("menu");return}
+ const v=e.target.closest("[data-vc]");if(v){const vd=v.querySelector("video");if(vd.paused){document.querySelectorAll(".vc video").forEach(x=>{if(x!==vd){x.pause();x.parentElement.classList.remove("pl")}});vd.play();v.classList.add("pl")}else{vd.pause();v.classList.remove("pl")}}});
+/* кружки */
+let CC=null,CCF="user";
+async function ccStart(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:CCF,width:{ideal:480},height:{ideal:480}},audio:true}),mt=["video/mp4","video/webm;codecs=vp9,opus","video/webm"].find(t=>MediaRecorder.isTypeSupported(t))||"",mr=new MediaRecorder(st,mt?{mimeType:mt}:{}),ch=[];
+ mr.ondataavailable=e=>e.data.size&&ch.push(e.data);const o=document.createElement("div");o.className="ccov";o.id="cc";o.innerHTML=`<div class="ccv"><video id="ccp" autoplay muted playsinline></video><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="#ffffff30"/><circle id="ccr" cx="50" cy="50" r="48" stroke="#ef4444" stroke-dasharray="301.6" stroke-dashoffset="301.6"/></svg></div><div id="cct" style="color:#fff;font-weight:700;font-size:18px">0:00</div><div class="row" style="gap:14px"><button class="g" data-cc="x" style="width:56px;height:56px;border-radius:50%">✕</button><button data-cc="send" style="height:56px;padding:0 28px;border-radius:28px">➤ Отправить</button><button class="g" data-cc="flip" style="width:56px;height:56px;border-radius:50%">🔄</button></div>`;
+ document.body.appendChild(o);$("#ccp").srcObject=st;CC={mr,st,ch,t0:Date.now(),mt:(mr.mimeType||mt).split(";")[0],send:false};CC.tm=setInterval(()=>{const s=(Date.now()-CC.t0)/1e3;$("#cct").textContent=fmtD(s|0);$("#ccr").style.strokeDashoffset=301.6*(1-Math.min(1,s/30));if(s>=30)ccStop(true)},200);mr.onstop=ccDone;mr.start()}catch(e){toast("Нет доступа к камере или микрофону")}}
+function ccStop(send){if(!CC)return;CC.send=send;clearInterval(CC.tm);if(CC.mr.state!="inactive")CC.mr.stop();CC.st.getTracks().forEach(t=>t.stop());$("#cc")?.remove()}
+async function ccDone(){const c=CC;CC=null;if(!c||!c.send)return;const s=Math.round((Date.now()-c.t0)/1e3);if(s<1)return toast("Слишком коротко");toast("Отправляю кружок…");const u=await upMedia(new Blob(c.ch,{type:c.mt}),c.mt.includes("mp4")?"mp4":"webm",c.mt);if(u)sendRaw("vid:"+u+"|"+s)}
+document.addEventListener("click",e=>{const x=e.target.closest("[data-cc]");if(!x)return;const a=x.dataset.cc;if(a=="x")ccStop(false);if(a=="send")ccStop(true);if(a=="flip"){ccStop(false);CCF=CCF=="user"?"environment":"user";setTimeout(ccStart,300)}});
+/* ---------- группы ---------- */
+const gav=(g,z)=>`<div style="width:${z}px;height:${z}px;border-radius:${Math.round(z*.36)}px;flex:none;display:grid;place-items:center;font-size:${Math.round(z*.45)}px;color:#fff;background:${g.avatar?`url(${g.avatar}) center/cover`:"linear-gradient(135deg,#8b6cff,#ff5f9e)"}">${g.avatar?"":"👥"}</div>`;
+const fileAv=(f,z=160)=>new Promise(r=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const c=document.createElement("canvas"),s=Math.min(im.width,im.height);c.width=c.height=z;c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,z,z);URL.revokeObjectURL(u);r(c.toDataURL("image/jpeg",.8))};im.src=u});
+async function loadGroups(){const{data:gm,error}=await sb.from("group_members").select("group_id,user_id");if(error){GERR=1;GRP=[];return}GERR=0;const ids=[...new Set((gm||[]).map(x=>x.group_id))];if(!ids.length){GRP=[];if(tab=="fam")draw();return}
+ const{data:gs}=await sb.from("groups").select("*").in("id",ids),need=[...new Set(gm.map(x=>x.user_id))].filter(i=>!PROF[i]);
+ if(need.length){const{data:pr}=await sb.from("profiles").select("id,name,color,avatar,status,txt").in("id",need);(pr||[]).forEach(p=>PROF[p.id]=p)}
+ GRP=(gs||[]).map(g=>({...g,members:gm.filter(x=>x.group_id==g.id).map(x=>x.user_id)}));if(tab=="fam")draw()}
+function gSheet(gid){const g=gid?GRP.find(x=>x.id==gid):null,own=g&&g.owner==UID,st={name:g?g.name:"",avatar:g?g.avatar:null,sel:new Set()},d=document.createElement("div");d.className="csov on";document.body.appendChild(d);
+ const pf=id=>id==UID?S.me:PROF[id]||F(id);
+ const render=()=>{d.innerHTML=`<div class="cspn"><div class="sh" style="margin:0 auto 12px"></div><div style="text-align:center"><div style="display:flex;justify-content:center;margin-bottom:10px" data-g2="av">${gav({avatar:st.avatar},88)}</div><div class="m" style="margin-bottom:10px">Нажми на значок, чтобы выбрать аватарку</div><input id="gnm" value="${E(st.name)}" placeholder="Название группы" maxlength="30" style="text-align:center;font-size:18px;font-weight:700"><input id="gaf" type="file" accept="image/*" hidden></div>
+  ${g?`<div class="m" style="margin:16px 0 8px">Участники (${g.members.length})</div>${g.members.map(u=>`<div class="row sp" style="margin-bottom:8px"><span class="row">${mini(pf(u),38)}<b>${E(pf(u).name)}${u==g.owner?" 👑":""}</b></span>${own&&u!=UID?`<button class="g s" data-g2="rm" data-k="${u}">Убрать</button>`:""}</div>`).join("")}`:""}
+  ${!g||own?`<div class="m" style="margin:14px 0 8px">${g?"Добавить друзей":"Кого добавить в группу"}:</div><div class="sc">${S.friends.filter(f=>!g||!g.members.includes(f.id)).map(f=>`<span class="chip ${st.sel.has(f.id)?"on":""}" data-g2="pick" data-k="${f.id}">${mini(f,22)}${E(f.name)}</span>`).join("")||'<span class="m">Все друзья уже в группе</span>'}</div>`:""}
+  <div class="row" style="margin-top:18px"><button class="f1" data-g2="save">${g?"Сохранить":"Создать группу"}</button><button class="g" data-g2="x">Закрыть</button></div>
+  ${g?`<button class="g s" data-g2="leave" style="margin-top:12px;color:var(--r)">${own?"Удалить группу":"Выйти из группы"}</button>`:""}</div>`};
+ render();
+ d.addEventListener("input",e=>{if(e.target.id=="gnm")st.name=e.target.value});
+ d.addEventListener("change",async e=>{if(e.target.id=="gaf"&&e.target.files[0]){st.avatar=await fileAv(e.target.files[0]);render()}});
+ d.addEventListener("click",async e=>{if(e.target==d)return d.remove();const x=e.target.closest("[data-g2]");if(!x)return;const a=x.dataset.g2;
+  if(a=="x")return d.remove();if(a=="av")return d.querySelector("#gaf").click();
+  if(a=="pick"){st.sel.has(x.dataset.k)?st.sel.delete(x.dataset.k):st.sel.add(x.dataset.k);return render()}
+  if(a=="rm"){await sb.from("group_members").delete().eq("group_id",g.id).eq("user_id",x.dataset.k);await loadGroups();return d.remove()}
+  if(a=="leave"){if(!confirm(own?"Удалить группу для всех?":"Выйти из группы?"))return;if(own)await sb.from("groups").delete().eq("id",g.id);else await sb.from("group_members").delete().eq("group_id",g.id).eq("user_id",UID);CO=false;await loadGroups();d.remove();draw();return}
+  if(a=="save"){const name=st.name.trim();if(!name)return toast("Назови группу");
+   if(g){await sb.from("groups").update({name,avatar:st.avatar}).eq("id",g.id);if(st.sel.size){await sb.from("group_members").insert([...st.sel].map(u=>({group_id:g.id,user_id:u})));sb.from("notifications").insert([...st.sel].map(u=>({user_id:u,kind:"group",data:{text:S.me.name+" добавил(а) тебя в группу «"+name+"»",from:UID}}))).then(()=>{})}await loadGroups();toast("Сохранено");return d.remove()}
+   const r=await sb.from("groups").insert({name,avatar:st.avatar,owner:UID}).select().single();if(r.error)return toast("Группы не настроены. Выполни SQL из инструкции");
+   await sb.from("group_members").insert([UID,...st.sel].map(u=>({group_id:r.data.id,user_id:u})));if(st.sel.size)sb.from("notifications").insert([...st.sel].map(u=>({user_id:u,kind:"group",data:{text:S.me.name+" добавил(а) тебя в группу «"+name+"»",from:UID}}))).then(()=>{});
+   await loadGroups();d.remove();tab="fam";room="g:"+r.data.id;CO=true;draw()}})}
+document.addEventListener("click",e=>{const x=e.target.closest("[data-g]");if(!x)return;if(x.dataset.g=="new")gSheet();if(x.dataset.g=="set"){const gid=+room.slice(2);if(GRP.find(g=>g.id==gid))gSheet(gid)}});
+const _d13=draw;draw=function(){_d13();if(window.ONLINE&&!GL&&UID){GL=1;loadGroups();sb.channel("grp").on("postgres_changes",{event:"*",schema:"public",table:"group_members"},()=>loadGroups()).on("postgres_changes",{event:"*",schema:"public",table:"groups"},()=>loadGroups()).subscribe()}};
 </script></body></html>
