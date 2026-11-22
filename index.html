@@ -1123,33 +1123,4 @@ async function ccStart(){try{const st=await navigator.mediaDevices.getUserMedia(
 function ccStop(send){if(!CC)return;CC.send=send;clearInterval(CC.tm);if(CC.mr.state!="inactive")CC.mr.stop();CC.st.getTracks().forEach(t=>t.stop());$("#cc")?.remove()}
 async function ccDone(){const c=CC;CC=null;if(!c||!c.send)return;const s=Math.round((Date.now()-c.t0)/1e3);if(s<1)return toast("Слишком коротко");toast("Отправляю кружок…");const u=await upMedia(new Blob(c.ch,{type:c.mt}),c.mt.includes("mp4")?"mp4":"webm",c.mt);if(u)sendRaw("vid:"+u+"|"+s)}
 document.addEventListener("click",e=>{const x=e.target.closest("[data-cc]");if(!x)return;const a=x.dataset.cc;if(a=="x")ccStop(false);if(a=="send")ccStop(true);if(a=="flip"){ccStop(false);CCF=CCF=="user"?"environment":"user";setTimeout(ccStart,300)}});
-/* ---------- группы ---------- */
-const gav=(g,z)=>`<div style="width:${z}px;height:${z}px;border-radius:${Math.round(z*.36)}px;flex:none;display:grid;place-items:center;font-size:${Math.round(z*.45)}px;color:#fff;background:${g.avatar?`url(${g.avatar}) center/cover`:"linear-gradient(135deg,#8b6cff,#ff5f9e)"}">${g.avatar?"":"👥"}</div>`;
-const fileAv=(f,z=160)=>new Promise(r=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const c=document.createElement("canvas"),s=Math.min(im.width,im.height);c.width=c.height=z;c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,z,z);URL.revokeObjectURL(u);r(c.toDataURL("image/jpeg",.8))};im.src=u});
-async function loadGroups(){const{data:gm,error}=await sb.from("group_members").select("group_id,user_id");if(error){GERR=1;GRP=[];return}GERR=0;const ids=[...new Set((gm||[]).map(x=>x.group_id))];if(!ids.length){GRP=[];if(tab=="fam")draw();return}
- const{data:gs}=await sb.from("groups").select("*").in("id",ids),need=[...new Set(gm.map(x=>x.user_id))].filter(i=>!PROF[i]);
- if(need.length){const{data:pr}=await sb.from("profiles").select("id,name,color,avatar,status,txt").in("id",need);(pr||[]).forEach(p=>PROF[p.id]=p)}
- GRP=(gs||[]).map(g=>({...g,members:gm.filter(x=>x.group_id==g.id).map(x=>x.user_id)}));if(tab=="fam")draw()}
-function gSheet(gid){const g=gid?GRP.find(x=>x.id==gid):null,own=g&&g.owner==UID,st={name:g?g.name:"",avatar:g?g.avatar:null,sel:new Set()},d=document.createElement("div");d.className="csov on";document.body.appendChild(d);
- const pf=id=>id==UID?S.me:PROF[id]||F(id);
- const render=()=>{d.innerHTML=`<div class="cspn"><div class="sh" style="margin:0 auto 12px"></div><div style="text-align:center"><div style="display:flex;justify-content:center;margin-bottom:10px" data-g2="av">${gav({avatar:st.avatar},88)}</div><div class="m" style="margin-bottom:10px">Нажми на значок, чтобы выбрать аватарку</div><input id="gnm" value="${E(st.name)}" placeholder="Название группы" maxlength="30" style="text-align:center;font-size:18px;font-weight:700"><input id="gaf" type="file" accept="image/*" hidden></div>
-  ${g?`<div class="m" style="margin:16px 0 8px">Участники (${g.members.length})</div>${g.members.map(u=>`<div class="row sp" style="margin-bottom:8px"><span class="row">${mini(pf(u),38)}<b>${E(pf(u).name)}${u==g.owner?" 👑":""}</b></span>${own&&u!=UID?`<button class="g s" data-g2="rm" data-k="${u}">Убрать</button>`:""}</div>`).join("")}`:""}
-  ${!g||own?`<div class="m" style="margin:14px 0 8px">${g?"Добавить друзей":"Кого добавить в группу"}:</div><div class="sc">${S.friends.filter(f=>!g||!g.members.includes(f.id)).map(f=>`<span class="chip ${st.sel.has(f.id)?"on":""}" data-g2="pick" data-k="${f.id}">${mini(f,22)}${E(f.name)}</span>`).join("")||'<span class="m">Все друзья уже в группе</span>'}</div>`:""}
-  <div class="row" style="margin-top:18px"><button class="f1" data-g2="save">${g?"Сохранить":"Создать группу"}</button><button class="g" data-g2="x">Закрыть</button></div>
-  ${g?`<button class="g s" data-g2="leave" style="margin-top:12px;color:var(--r)">${own?"Удалить группу":"Выйти из группы"}</button>`:""}</div>`};
- render();
- d.addEventListener("input",e=>{if(e.target.id=="gnm")st.name=e.target.value});
- d.addEventListener("change",async e=>{if(e.target.id=="gaf"&&e.target.files[0]){st.avatar=await fileAv(e.target.files[0]);render()}});
- d.addEventListener("click",async e=>{if(e.target==d)return d.remove();const x=e.target.closest("[data-g2]");if(!x)return;const a=x.dataset.g2;
-  if(a=="x")return d.remove();if(a=="av")return d.querySelector("#gaf").click();
-  if(a=="pick"){st.sel.has(x.dataset.k)?st.sel.delete(x.dataset.k):st.sel.add(x.dataset.k);return render()}
-  if(a=="rm"){await sb.from("group_members").delete().eq("group_id",g.id).eq("user_id",x.dataset.k);await loadGroups();return d.remove()}
-  if(a=="leave"){if(!confirm(own?"Удалить группу для всех?":"Выйти из группы?"))return;if(own)await sb.from("groups").delete().eq("id",g.id);else await sb.from("group_members").delete().eq("group_id",g.id).eq("user_id",UID);CO=false;await loadGroups();d.remove();draw();return}
-  if(a=="save"){const name=st.name.trim();if(!name)return toast("Назови группу");
-   if(g){await sb.from("groups").update({name,avatar:st.avatar}).eq("id",g.id);if(st.sel.size){await sb.from("group_members").insert([...st.sel].map(u=>({group_id:g.id,user_id:u})));sb.from("notifications").insert([...st.sel].map(u=>({user_id:u,kind:"group",data:{text:S.me.name+" добавил(а) тебя в группу «"+name+"»",from:UID}}))).then(()=>{})}await loadGroups();toast("Сохранено");return d.remove()}
-   const r=await sb.from("groups").insert({name,avatar:st.avatar,owner:UID}).select().single();if(r.error)return toast("Группы не настроены. Выполни SQL из инструкции");
-   await sb.from("group_members").insert([UID,...st.sel].map(u=>({group_id:r.data.id,user_id:u})));if(st.sel.size)sb.from("notifications").insert([...st.sel].map(u=>({user_id:u,kind:"group",data:{text:S.me.name+" добавил(а) тебя в группу «"+name+"»",from:UID}}))).then(()=>{});
-   await loadGroups();d.remove();tab="fam";room="g:"+r.data.id;CO=true;draw()}})}
-document.addEventListener("click",e=>{const x=e.target.closest("[data-g]");if(!x)return;if(x.dataset.g=="new")gSheet();if(x.dataset.g=="set"){const gid=+room.slice(2);if(GRP.find(g=>g.id==gid))gSheet(gid)}});
-const _d13=draw;draw=function(){_d13();if(window.ONLINE&&!GL&&UID){GL=1;loadGroups();sb.channel("grp").on("postgres_changes",{event:"*",schema:"public",table:"group_members"},()=>loadGroups()).on("postgres_changes",{event:"*",schema:"public",table:"groups"},()=>loadGroups()).subscribe()}};
-</script></body></html>
+
