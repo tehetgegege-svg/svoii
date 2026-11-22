@@ -946,6 +946,7 @@ const _chC=chat;chat=function(){return CO?_chC():chatList()};
 document.addEventListener("input",e=>{if(e.target.id!="cq")return;CQ=e.target.value;draw();const c=$("#cq");if(c){c.focus();c.setSelectionRange(c.value.length,c.value.length)}});
 document.addEventListener("click",e=>{const s=e.target.closest("[data-a=sf]");if(s&&!CO&&tab=="fam"){CO=true;room=s.dataset.k;mkRead(room)}},true);
 document.addEventListener("click",e=>{if(e.target.closest("[data-p=cback]")){CO=false;draw()}});
+ 
 /* ---------- шашки: дамки летают, бьют назад ---------- */
 function moves(b,t,only){const o=[],caps=[];for(let i=0;i<64;i++){const v=b[i];if(!v||v%2!=t%2||(only!=null&&i!=only))continue;const k=v>2,r=i>>3,c=i&7,dir=t==1?-1:1;
  for(const dr of[-1,1])for(const dc of[-1,1]){
@@ -993,6 +994,49 @@ document.addEventListener("click",e=>{const c=e.target.closest("[data-bp]");if(c
  const x=e.target.closest("[data-p]");if(!x||!BS)return;const d=x.dataset;
  if(d.p=="bst"){BS.cur=+d.k;draw()}if(d.p=="bsrot"){BS.hz=!BS.hz;draw()}
  if(d.p=="bscl"&&!BS.rdy){BS.my={g:Array(100).fill(0),ships:[]};BS.tray=[4,3,3,2,2,2,1,1,1,1];BS.cur=4;draw()}});
+ /* ---------- стикеры, GIF, мемы, кружки ---------- */
+const SK={"Эмоции":"😂 🤣 😍 🥰 😎 🤯 🥳 😭 😡 🤔 🙄 😴 🤡 💀 👻 😈 🫡 🤝 🙏 💪 🔥 💯 ❤️ 💔 ✨ 🎉 👍 👎 👀 🙈".split(" "),"Звери":"🐶 🐱 🐸 🐵 🦄 🐼 🐧 🦊 🐷 🐔 🦆 🐙 🦖 🐢 🐻 🐰 🦁 🐯 🦉 🐝".split(" "),"Еда":"🍕 🍔 🍟 🌮 🍣 🍩 🍺 ☕ 🍷 🍿 🥑 🍉 🍪 🍫 🥂".split(" "),"Мемы":"🗿 🫠 🤌 🥶 🤮 🫣 😮‍💨 🧠 🤏 💅 🤪 😏 🥴 🤓 😤".split(" ")};
+const SKT=["ЖЁСТКО","РЖУ","ОК","БАЗА","ПОГНАЛИ","НЕ ВАЖНО","СПАСИБО","ГДЕ ТЫ?","ПОЗВОНИ","ХАХА","КРИНЖ","ТОП","ПРИВЕТ","ПОКА"];
+const sendRaw=async body=>{const r=await sb.from("messages").insert({room,sender:UID,body}).select().single();if(r.error)return toast("Не отправилось");onMsg(r.data)};
+async function upMedia(blob,ext,type){const path=`${UID}/${Date.now()}.${ext}`,{error}=await sb.storage.from("media").upload(path,blob,{contentType:type});if(error){toast("Не загрузилось: "+error.message);return null}return sb.storage.from("media").getPublicUrl(path).data.publicUrl}
+const _mb2=mBody;mBody=function(m){const b=m.body||"";
+ if(b.startsWith("stk:")){const q=b.match(/^stk:(\w):(.*)$/)||[],v=q[2]||"";if(q[1]=="e")return`<div class="stk">${E(v)}</div>`;let h=0;for(const c of v)h=(h*7+c.charCodeAt(0))%360;return`<div class="stt" style="--h:${h}">${E(v)}</div>`}
+ if(b.startsWith("gif:")){const u=b.slice(4);return`<img class="mi" src="${E(u)}" data-img="${E(u)}" loading="lazy">`}
+ if(b.startsWith("vid:")){const[u,d]=b.slice(4).split("|");return`<div class="vc" data-vc><video src="${E(u)}#t=0.1" playsinline preload="metadata" loop></video><i>▶</i><span>${fmtD(+d||0)}</span></div>`}
+ return _mb2(m)};
+let CST="menu",SKP="Эмоции",MM={bg:0,img:null};
+const MBG=[["#8b6cff","#ff5f9e","🗿"],["#0ea5e9","#22c55e","🐸"],["#f59e0b","#ef4444","😎"],["#111827","#6b7280","💀"],["#ec4899","#f97316","🤡"],["#14b8a6","#6366f1","🧠"]];
+function csBody(t){const back='<div class="row sp" style="margin-bottom:12px"><button class="g s" data-cs="menu">‹ Назад</button><button class="g s" data-cs="close">Закрыть</button></div>';
+ if(t=="menu")return`<div class="cgr"><div class="ct" data-cs="photo"><b>📷</b>Фото</div><div class="ct" data-cs="stk"><b>😎</b>Стикеры</div><div class="ct" data-cs="gif"><b>🎞️</b>GIF</div><div class="ct" data-cs="meme"><b>🤪</b>Мем</div><div class="ct" data-cs="circle"><b>⭕</b>Кружок</div><div class="ct" data-cs="voice"><b>🎤</b>Голос</div></div>`;
+ if(t=="stk")return back+`<div class="sc" style="margin-bottom:10px">${[...Object.keys(SK),"Надписи"].map(k=>`<span class="chip ${SKP==k?"on":""}" data-cs="pack" data-k="${k}">${k}</span>`).join("")}</div>`+(SKP=="Надписи"?`<div class="skt">${SKT.map(x=>{let h=0;for(const c of x)h=(h*7+c.charCodeAt(0))%360;return`<span style="--h:${h}" data-cs="send" data-b="stk:t:${x}">${x}</span>`}).join("")}</div>`:`<div class="skg">${SK[SKP].map(x=>`<span data-cs="send" data-b="stk:e:${x}">${x}</span>`).join("")}</div>`);
+ if(t=="gif")return back+(GKEY?`<div class="row"><input id="gq" class="f1" placeholder="Поиск GIF (на английском лучше)"><button data-cs="gs">🔍</button></div><div class="gfg" id="gfg"></div>`:`<div class="m" style="margin-bottom:8px">Вставь ссылку на GIF:</div><div class="row"><input id="gu" class="f1" placeholder="https://…/файл.gif"><button data-cs="gurl">➤</button></div><button class="g" data-cs="gfile" style="width:100%;margin-top:10px">📁 Выбрать GIF с телефона</button><div class="m" style="margin:14px 0 8px;font-size:12px">Чтобы искать GIF прямо здесь, вставь свой бесплатный ключ GIPHY (developers.giphy.com):</div><div class="row"><input id="gk" class="f1" placeholder="Ключ GIPHY"><button class="g" data-cs="gkey">OK</button></div>`);
+ if(t=="meme"){const m=MBG[MM.bg];return back+`<canvas id="mcv" width="600" height="600" class="mq2"></canvas><div class="sc" style="margin:10px 0">${MBG.map((x,i)=>`<span class="chip ${MM.bg==i&&!MM.img?"on":""}" data-cs="mbg" data-k="${i}">${x[2]}</span>`).join("")}<span class="chip" data-cs="mpic">📷 Своё фото</span></div><input id="mtop" placeholder="Верхний текст" style="margin-bottom:8px"><input id="mbot" placeholder="Нижний текст" style="margin-bottom:12px"><button data-cs="msend" style="width:100%">Отправить мем</button><input id="mfile" type="file" accept="image/*" hidden>`}return back}
+function csOpen(t){let o=$("#cs");if(!o){o=document.createElement("div");o.id="cs";o.className="csov";document.body.appendChild(o);o.addEventListener("click",csClick)}CST=t;o.innerHTML=`<div class="cspn"><div class="sh" style="margin:0 auto 12px"></div>${csBody(t)}</div>`;o.classList.add("on");if(t=="meme")memeDraw();if(t=="gif"&&GKEY)gifSearch("")}
+const csClose=()=>{const o=$("#cs");if(o)o.classList.remove("on")};
+function memeDraw(){const c=$("#mcv");if(!c)return;const x=c.getContext("2d"),m=MBG[MM.bg];x.clearRect(0,0,600,600);
+ if(MM.img){const im=MM.img,z=Math.max(600/im.width,600/im.height);x.drawImage(im,(600-im.width*z)/2,(600-im.height*z)/2,im.width*z,im.height*z)}else{const g=x.createLinearGradient(0,0,600,600);g.addColorStop(0,m[0]);g.addColorStop(1,m[1]);x.fillStyle=g;x.fillRect(0,0,600,600);x.font="320px serif";x.textAlign="center";x.textBaseline="middle";x.fillText(m[2],300,310)}
+ const tx=(t,y)=>{t=(t||"").toUpperCase();if(!t)return;let f=64;x.textAlign="center";x.textBaseline="middle";do{x.font=`900 ${f}px Impact,"Arial Black",sans-serif`;f-=3}while(x.measureText(t).width>570&&f>16);x.lineWidth=f/5+3;x.strokeStyle="#000";x.lineJoin="round";x.strokeText(t,300,y);x.fillStyle="#fff";x.fillText(t,300,y)};
+ tx($("#mtop")?.value,56);tx($("#mbot")?.value,544)}
+async function gifSearch(q){const g=$("#gfg");if(!g)return;try{const u=q?`https://api.giphy.com/v1/gifs/search?api_key=${GKEY}&q=${encodeURIComponent(q)}&limit=24&lang=ru`:`https://api.giphy.com/v1/gifs/trending?api_key=${GKEY}&limit=24`,r=await(await fetch(u)).json();g.innerHTML=(r.data||[]).map(d=>`<img src="${d.images.fixed_height_small.url}" data-cs="send" data-b="gif:${d.images.fixed_height.url}">`).join("")||'<div class="m">Ничего не нашлось</div>'}catch(e){g.innerHTML='<div class="m">Не получилось загрузить. Проверь ключ</div>'}}
+async function csClick(e){const x=e.target.closest("[data-cs]");if(!x){if(e.target.id=="cs")csClose();return}const d=x.dataset,a=d.cs;
+ if(a=="close")return csClose();if(["menu","stk","gif","meme"].includes(a))return csOpen(a);
+ if(a=="pack"){SKP=d.k;return csOpen("stk")}
+ if(a=="send"){csClose();return sendRaw(d.b)}
+ if(a=="photo"){csClose();return $("#pf").click()}
+ if(a=="voice"){csClose();return recStart()}
+ if(a=="circle"){csClose();return ccStart()}
+ if(a=="gs")return gifSearch($("#gq").value.trim());
+ if(a=="gurl"){const u=$("#gu").value.trim();if(!/^https?:\/\//.test(u))return toast("Нужна ссылка на GIF");csClose();return sendRaw("gif:"+u)}
+ if(a=="gfile"){const i=document.createElement("input");i.type="file";i.accept="image/gif";i.onchange=async()=>{const f=i.files[0];if(!f)return;csClose();toast("Отправляю…");const u=await upMedia(f,"gif","image/gif");if(u)sendRaw("gif:"+u)};return i.click()}
+ if(a=="gkey"){const k=$("#gk").value.trim();if(k){GKEY=k;try{localStorage.setItem("gk",k)}catch(e){}csOpen("gif")}}
+ if(a=="mbg"){MM.bg=+d.k;MM.img=null;return memeDraw()}
+ if(a=="mpic")return $("#mfile").click();
+ if(a=="msend"){const c=$("#mcv");c.toBlob(async b=>{csClose();toast("Отправляю…");const u=await upMedia(b,"jpg","image/jpeg");if(u)sendRaw("img:"+u)},"image/jpeg",.85)}}
+document.addEventListener("input",e=>{if(e.target.id=="mtop"||e.target.id=="mbot")memeDraw()});
+document.addEventListener("change",e=>{if(e.target.id=="mfile"&&e.target.files[0]){const im=new Image();im.onload=()=>{MM.img=im;memeDraw()};im.src=URL.createObjectURL(e.target.files[0])}
+ else if(e.target.id=="pf"&&e.target.files[0]&&e.target.files[0].type=="image/gif"){e.stopImmediatePropagation();const f=e.target.files[0];e.target.value="";toast("Отправляю…");upMedia(f,"gif","image/gif").then(u=>u&&sendRaw("gif:"+u))}},true);
+document.addEventListener("click",e=>{if(e.target.closest("[data-csopen]")){csOpen("menu");return}
+ const v=e.target.closest("[data-vc]");if(v){const vd=v.querySelector("video");if(vd.paused){document.querySelectorAll(".vc video").forEach(x=>{if(x!==vd){x.pause();x.parentElement.classList.remove("pl")}});vd.play();v.classList.add("pl")}else{vd.pause();v.classList.remove("pl")}}});
 /* ---------- служебное ---------- */
 function getLsm2(){return getLsm()}
 const _d11=draw;draw=function(){if(tab!="fam")CO=false;_d11();const L=tab=="rest"&&((GM=="mono"&&RG&&RG.s)||(GM=="bs"&&BS)),G=tab=="rest"&&((GM=="ck"&&S.ck)||(GM=="cards"&&S.cg));
