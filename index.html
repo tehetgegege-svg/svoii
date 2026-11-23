@@ -503,7 +503,7 @@ document.addEventListener("click",async e=>{if(!window.ONLINE||!e.target.closest
  if(!("serviceWorker" in navigator)||!("PushManager" in window)||!window.Notification)return toast("На iPhone: Поделиться → «На экран Домой», открой «Свои» оттуда и нажми снова");
  if(await Notification.requestPermission()!="granted")return toast("Разреши уведомления в настройках телефона");
  try{const reg=await navigator.serviceWorker.ready;let s=await reg.pushManager.getSubscription();if(!s)s=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)});
-  const{error}=await sb.from("push_subs").upsert({endpoint:s.endpoint,user_id:UID,sub:s.toJSON()});if(error)return toast("Не вышло: "+error.message);SUBBED=true;toast("Уведомления на телефон включены 🔔")}catch(x){toast("Ошибка: "+x.message)}});
+  const{error}=await sb.rpc("save_push_sub",{p_endpoint:s.endpoint,p_sub:s.toJSON()});if(error)return toast("Не вышло: "+error.message);SUBBED=true;toast("Уведомления на телефон включены 🔔")}catch(x){toast("Ошибка: "+x.message)}});
 
 /* ===== v6: новая лента, профиль друга, отмена игр, реакции ===== */
 document.head.insertAdjacentHTML("beforeend",`<style>
@@ -1162,7 +1162,7 @@ let PSTM="";async function pushStatus(){const e=$("#pst");if(!e)return;let t;
  if(!("serviceWorker" in navigator)||!("PushManager" in window)||!window.Notification)t=/iPhone|iPad/.test(navigator.userAgent)?"⚠️ На iPhone: «Поделиться» → «На экран Домой», потом открой «Свои» с иконки":"⚠️ Этот браузер не поддерживает пуши";
  else if(Notification.permission=="denied")t="⛔ Уведомления запрещены: Настройки → Уведомления → Свои";
  else{const r=await navigator.serviceWorker.ready.catch(()=>null),s=r&&await r.pushManager.getSubscription();
-  if(s){t="✅ Уведомления на экран блокировки включены";SUBBED=true;sb.from("push_subs").upsert({endpoint:s.endpoint,user_id:UID,sub:s.toJSON()}).then(x=>{if(x&&x.error)$("#pst")&&($("#pst").textContent="⚠️ Подписка не сохранилась на сервере: "+x.error.message)})}else t="Не включены — нажми кнопку выше"}
+  if(s){t="✅ Уведомления на экран блокировки включены";SUBBED=true;sb.rpc("save_push_sub",{p_endpoint:s.endpoint,p_sub:s.toJSON()}).then(x=>{if(x&&x.error)$("#pst")&&($("#pst").textContent="⚠️ Подписка не сохранилась на сервере: "+x.error.message)})}else t="Не включены — нажми кнопку выше"}
  e.textContent=t+(PSTM?"\n"+PSTM:"")}
 const _d14=draw;draw=function(){_d14();if(tab=="me"&&window.ONLINE)setTimeout(pushStatus,50)};
 document.addEventListener("click",async e=>{if(!window.ONLINE||!e.target.closest("[data-p=pt]"))return;ding();PSTM="Отправляю тест…";pushStatus();
