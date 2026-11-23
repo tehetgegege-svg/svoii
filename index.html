@@ -485,7 +485,7 @@ document.addEventListener("click",e=>{if(!window.ONLINE)return;if(e.target.close
   sb.from("notifications").insert(ids.map(id=>({user_id:id,kind:"cards",data:{gid:ONC.gid,from:UID,text:S.me.name+" зовёт играть в дурака"}}))).then(()=>{});toast("Зову друзей за стол");draw()}
  if(d.p=="cj"){const g=CINV.find(y=>y.gid==d.k);if(!g)return;CINV=CINV.filter(y=>y!=g);ONC={gid:g.gid,host:false,started:false};ONC.toH=cch("c"+g.gid+"_h");ONC.inC=cch("c"+g.gid+"_"+UID,onGuestMsg);
   setTimeout(()=>csend(ONC&&ONC.toH,{t:"join",u:UID}),800);tab="rest";draw()}
- if(d.p=="cs"&&ONC?.host){PICK=new Set([...ONC.joined]);ONC.started=true;ONC.sent={};GM="cards";dkNew();draw()}
+ if(d.p=="cs"&&ONC?.host){PICK=new Set([...ONC.joined]);DKB=0;ONC.started=true;ONC.sent={};GM="cards";dkNew();draw()}
  if(d.p=="cb"){GM="cards";draw()}
  if(d.p=="cl"){cClose();GM=null;draw()}});
 
@@ -613,7 +613,7 @@ document.head.insertAdjacentHTML("beforeend",`<style>
 .vu{display:inline-block;border-radius:14px;transition:box-shadow .2s}.vu.spk{box-shadow:0 0 0 3px #34d399,0 0 16px #34d399aa}
 #vbn{margin-top:12px}.lb2{position:fixed;inset:0;background:#000d;z-index:80;display:grid;place-items:center;animation:fade .25s both}.lb2 img{max-width:94vw;max-height:88vh;border-radius:16px}
 </style>`);
-const pv=b=>b.startsWith("img:")?"📷 Фото":b.startsWith("voice:")?"🎤 Голосовое":b.slice(0,40);
+const pv=b=>b.startsWith("img:")?"📷 Фото":b.startsWith("voice:")?"🎤 Голосовое":b.startsWith("stk:")?"😎 Стикер":b.startsWith("gif:")?"🎞️ GIF":b.startsWith("vid:")?"⭕ Кружок":b.slice(0,40);
 const fmtD=s=>(s/60|0)+":"+String(s%60|0).padStart(2,"0");
 const ft=ts=>new Date(ts).toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"});
 const vu=id=>id==UID?S.me:PROF[id]||S.friends.find(f=>f.id==id)||VPE[id]?.[0]||{name:"?",color:200};
@@ -629,7 +629,7 @@ rest=function(){if(GM=="cards"&&S.cg)return cardsView();if(GM=="ck"&&S.ck)return
   ONC.host?hd+ONC.ids.map(id=>`<div class="row sp" style="margin-bottom:10px"><span class="row">${mini(F(id),38)}<b>${E(F(id).name)}</b></span><span class="m">${ONC.joined.has(id)?"за столом ✓":"думает…"}</span></div>`).join("")+`<div class="row" style="margin-top:6px"><button data-p="cs" ${ONC.joined.size?"":"disabled"}>Раздать</button><button class="g" data-p="cl">Отмена</button></div></div>`:
   hd+`<div class="m">Ждём, пока хозяин раздаст карты…</div><div class="row" style="margin-top:12px"><button class="g" data-p="cl">Выйти</button></div></div>`}
  const fr=on&&S.friends.length,none='<div class="m">Добавь друзей, чтобы играть вместе</div>';
- const cb=(ONC?'<div class="m">Стол уже открыт — смотри выше</div>':fr?`<div class="m" style="margin-bottom:8px">Кого позвать (до 3):</div><div class="sc">${S.friends.map(f=>`<span class="chip ${COSEL.has(f.id)?"on":""}" data-p="ct" data-k="${f.id}">${mini(f,22)}${E(f.name)}</span>`).join("")}</div>${COSEL.size?`<button data-p="cO" style="margin-top:12px;width:100%;background:#fff;color:#222">Позвать за стол</button>`:""}`:none)+`<div class="gdiv">или</div><button class="g" data-p="bc" style="width:100%">🤖 Против ботов</button>${S.cg&&S.cg.dur&&!ONC?`<button class="g" data-a="gcc" style="width:100%;margin-top:8px">Продолжить партию</button>`:""}`;
+ const cb=(ONC?'<div class="m">Стол уже открыт — смотри выше</div>':fr?`<div class="m" style="margin-bottom:8px">Кого позвать (до 3):</div><div class="sc">${S.friends.map(f=>`<span class="chip ${COSEL.has(f.id)?"on":""}" data-p="ct" data-k="${f.id}">${mini(f,22)}${E(f.name)}</span>`).join("")}</div>${COSEL.size?`<button data-p="cO" style="margin-top:12px;width:100%;background:#fff;color:#222">Позвать за стол</button>`:""}`:none)+`<div class="gdiv">или</div><div class="m" style="margin-bottom:8px">Ботов за столом:</div><div class="chips">${[1,2,3].map(n=>`<span class="chip ${DKN==n?"on":""}" data-p="dkn" data-k="${n}">${n}</span>`).join("")}</div><button class="g" data-p="bc" style="width:100%;margin-top:10px">🤖 Играть с ботами</button>${S.cg&&S.cg.dur&&!ONC?`<button class="g" data-a="gcc" style="width:100%;margin-top:8px">Продолжить партию</button>`:""}`;
  const kb=(fr?S.friends.map(f=>`<div class="row sp" style="margin-bottom:10px"><span class="row">${mini(f,38)}<b>${E(f.name)}</b></span><button class="s" data-p="gO" data-k="${f.id}" style="background:#fff;color:#222">Играть</button></div>`).join(""):none)+`<div class="gdiv">или</div><button class="g" data-a="gk" style="width:100%">🤖 Против бота</button>${S.ck&&!ONG&&!S.ck.quit?`<button class="g" data-a="gkc" style="width:100%;margin-top:8px">Продолжить партию</button>`:""}`;
  const tile=(k,body)=>{const t=GTL[k];return`<div class="gt ${GSEL==k?"open":""}" style="--h:${t.h}"><div class="gh" data-p="gs" data-k="${k}"><div class="gart">${t.art}</div><div><b>${t.n}</b><div class="m2">${t.s}</div></div><span class="chev">›</span></div>${GSEL==k?`<div class="gb">${body}</div>`:""}</div>`};
  return inv+lob+hubGrid(cb,kb)};
@@ -694,7 +694,8 @@ document.addEventListener("click",e=>{const x=e.target.closest("[data-vp],[data-
  if(x.dataset.vp){const el=x.closest(".vm");if(VAel===el&&!VA.paused){VA.pause();return}if(VAel&&VAel!==el){VAel.querySelector(".vp").textContent="▶";vbars(0)}VAel=el;if(VA.src!=x.dataset.vp)VA.src=x.dataset.vp;VA.play();x.textContent="⏸";return}
  const d=x.dataset;if(!window.ONLINE)return;
  if(d.p=="gs"){GSEL=GSEL==d.k?null:d.k;draw()}
- if(d.p=="bc"){if(!S.friends.length)return toast("Для игры с ботами нужен хотя бы один друг");if(!PICK.size)S.friends.slice(0,2).forEach(f=>PICK.add(f.id));if(ONC)cClose();fireA("gc")}
+ if(d.p=="dkn"){DKN=+d.k;draw()}
+ if(d.p=="bc"){if(ONC)cClose();PICK=new Set();DKB=DKN;S.cg=null;GM="cards";dkNew();draw()}
  if(d.p=="vj")vJoin();if(d.p=="vl")vLeave();
  if(d.p=="vm"&&VL){VMUTE=!VMUTE;VL.getAudioTracks().forEach(t=>t.enabled=!VMUTE);vPill()}
  if(d.p=="rec")recStart();if(d.p=="rc")recStop(false);if(d.p=="rs")recStop(true)});
@@ -939,14 +940,13 @@ const mkRead=r=>{S.read=S.read||{};const p=PV[r];if(p){p.unread=0;if(p.last)S.re
 async function loadPV(){const{data}=await sb.from("messages").select("*").order("ts",{ascending:false}).limit(300);S.read=S.read||{};PV={};(data||[]).forEach(m=>{const p=PV[m.room]=PV[m.room]||{last:m,unread:0};PVS.add(m.id);if(m.sender!=UID&&Date.parse(m.ts)>(S.read[m.room]||0))p.unread++});if(tab=="fam"&&!CO)draw()}
 const _om11=onMsg;onMsg=async function(r){await _om11(r);if(PVS.has(r.id))return;PVS.add(r.id);const p=PV[r.room]=PV[r.room]||{last:r,unread:0};p.last=r;
  if(tab=="fam"&&CO&&room==r.room&&!document.hidden){S.read=S.read||{};S.read[r.room]=Date.parse(r.ts)}else if(r.sender!=UID)p.unread++;if(tab=="fam"&&!CO)draw()};
-function chatList(){const q=CQ.trim().toLowerCase(),rows=[{room:"all",name:"Общий чат",all:1},...S.fams.map(x=>({room:x.id,name:x.name,f:F(x.members[0])}))].filter(x=>!q||x.name.toLowerCase().includes(q)).map(x=>({...x,l:PV[x.room]?.last,u:PV[x.room]?.unread||0})).sort((a,b)=>(b.l?Date.parse(b.l.ts):0)-(a.l?Date.parse(a.l.ts):0)||a.name.localeCompare(b.name));
+function chatList(){const q=CQ.trim().toLowerCase(),rows=[{room:"all",name:"Общий чат",all:1},...GRP.map(g=>({room:"g:"+g.id,name:g.name,g})),...S.fams.map(x=>({room:x.id,name:x.name,f:F(x.members[0])}))].filter(x=>!q||x.name.toLowerCase().includes(q)).map(x=>({...x,l:PV[x.room]?.last,u:PV[x.room]?.unread||0})).sort((a,b)=>(b.l?Date.parse(b.l.ts):0)-(a.l?Date.parse(a.l.ts):0)||a.name.localeCompare(b.name));
  const tm=l=>{if(!l)return"";const d=new Date(l.ts);return d.toDateString()==new Date().toDateString()?ft(l.ts):d.toLocaleDateString("ru",{day:"numeric",month:"short"})};
- return`<div class="clt">Чаты</div><input id="cq" placeholder="Найти друга" value="${E(CQ)}" style="margin-bottom:12px"><div>${rows.map(x=>`<div class="cr" data-a="sf" data-k="${x.room}">${x.all?'<div class="cav">💬</div>':mini(x.f,54)}<div class="f1" style="min-width:0"><b>${E(x.name)}</b><div class="m cpv">${E(x.l?(x.l.sender==UID?"Ты: ":"")+pv(x.l.body):"Нет сообщений — напиши первым")}</div></div><div class="cm"><span class="m">${tm(x.l)}</span>${x.u?`<span class="ub">${x.u}</span>`:""}</div></div>`).join("")||'<div class="m" style="text-align:center;padding:30px 0">Никого не нашли</div>'}</div>`}
+ return`<div class="row sp"><div class="clt">Чаты</div><button class="s" data-g="new">＋ Группа</button></div><input id="cq" placeholder="Найти друга" value="${E(CQ)}" style="margin-bottom:12px"><div>${rows.map(x=>`<div class="cr" data-a="sf" data-k="${x.room}">${x.all?'<div class="cav">💬</div>':x.g?gav(x.g,54):mini(x.f,54)}<div class="f1" style="min-width:0"><b>${E(x.name)}</b><div class="m cpv">${E(x.l?(x.l.sender==UID?"Ты: ":"")+pv(x.l.body):"Нет сообщений — напиши первым")}</div></div><div class="cm"><span class="m">${tm(x.l)}</span>${x.u?`<span class="ub">${x.u}</span>`:""}</div></div>`).join("")||'<div class="m" style="text-align:center;padding:30px 0">Никого не нашли</div>'}</div>`}
 const _chC=chat;chat=function(){return CO?_chC():chatList()};
 document.addEventListener("input",e=>{if(e.target.id!="cq")return;CQ=e.target.value;draw();const c=$("#cq");if(c){c.focus();c.setSelectionRange(c.value.length,c.value.length)}});
 document.addEventListener("click",e=>{const s=e.target.closest("[data-a=sf]");if(s&&!CO&&tab=="fam"){CO=true;room=s.dataset.k;mkRead(room)}},true);
 document.addEventListener("click",e=>{if(e.target.closest("[data-p=cback]")){CO=false;draw()}});
- 
 /* ---------- шашки: дамки летают, бьют назад ---------- */
 function moves(b,t,only){const o=[],caps=[];for(let i=0;i<64;i++){const v=b[i];if(!v||v%2!=t%2||(only!=null&&i!=only))continue;const k=v>2,r=i>>3,c=i&7,dir=t==1?-1:1;
  for(const dr of[-1,1])for(const dc of[-1,1]){
@@ -994,78 +994,12 @@ document.addEventListener("click",e=>{const c=e.target.closest("[data-bp]");if(c
  const x=e.target.closest("[data-p]");if(!x||!BS)return;const d=x.dataset;
  if(d.p=="bst"){BS.cur=+d.k;draw()}if(d.p=="bsrot"){BS.hz=!BS.hz;draw()}
  if(d.p=="bscl"&&!BS.rdy){BS.my={g:Array(100).fill(0),ships:[]};BS.tray=[4,3,3,2,2,2,1,1,1,1];BS.cur=4;draw()}});
- /* ===== v12: боты в дураке, стикеры/GIF/мемы/кружки, группы ===== */
-document.head.insertAdjacentHTML("beforeend",`<style>
-.stk{font-size:76px;line-height:1.05;animation:stk .6s var(--bounce) both;filter:drop-shadow(0 6px 8px #0004)}@keyframes stk{from{transform:scale(.2) rotate(-25deg);opacity:0}}
-.stt{font-weight:900;font-size:24px;letter-spacing:-.5px;padding:10px 16px;border-radius:18px;color:#fff;background:linear-gradient(135deg,hsl(var(--h),85%,58%),hsl(calc(var(--h) + 45),85%,48%));transform:rotate(-4deg);box-shadow:0 10px 20px -8px hsl(var(--h),85%,40%);animation:stk .6s var(--bounce) both}
-.bb.nb{background:none!important;padding:0 2px}.bb.nb em{color:var(--m)}.bb.nb small{opacity:.8}
-.vc{position:relative;width:200px;height:200px;border-radius:50%;overflow:hidden;cursor:pointer;background:#000;box-shadow:0 10px 24px -10px #000a;animation:stk .5s var(--bounce) both}.vc video{width:100%;height:100%;object-fit:cover;display:block}
-.vc i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:38px;color:#fff;background:#0003;transition:opacity .2s}.vc.pl i{opacity:0}.vc span{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:11px;background:#0008;color:#fff;padding:2px 8px;border-radius:10px}
-.csov{position:fixed;inset:0;z-index:72;background:#0008;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}.csov.on{opacity:1;pointer-events:auto}
-.cspn{width:100%;max-width:520px;margin:0 auto;border-radius:32px 32px 0 0;background:color-mix(in srgb,var(--c) 96%,transparent);backdrop-filter:blur(24px);padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:80dvh;overflow:auto;animation:up .45s var(--sp) both}
-.cgr{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ct{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 4px;border-radius:22px;font-size:13px;font-weight:600;background:var(--c2);cursor:pointer;transition:transform .4s var(--bounce)}.ct:active{transform:scale(.92)}.ct b{font-size:32px;font-weight:400}
-.skg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.skg span{font-size:38px;text-align:center;padding:6px 0;border-radius:14px;cursor:pointer;transition:transform .3s var(--bounce)}.skg span:active{transform:scale(1.3)}
-.skt{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.skt span{text-align:center;font-weight:800;padding:12px 6px;border-radius:14px;color:#fff;background:linear-gradient(135deg,hsl(var(--h),85%,58%),hsl(calc(var(--h) + 45),85%,48%));cursor:pointer}
-.gfg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.gfg img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;cursor:pointer;background:var(--c2)}
-.ccov{position:fixed;inset:0;z-index:90;background:#000d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;animation:fade .25s both}
-.ccv{position:relative;width:min(72vw,300px);aspect-ratio:1}.ccv video{width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scaleX(-1)}.ccv svg{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);transform:rotate(-90deg)}.ccv circle{fill:none;stroke-width:5;stroke-linecap:round}
-.mq2{width:100%;border-radius:16px;background:#222}
-</style>`);
-let DKB=0,DKN=2,GRP=[],GL=0,GERR=0,GKEY="";try{GKEY=localStorage.getItem("gk")||""}catch(e){}
-/* ---------- карты с ботами ---------- */
-dkNew=function(){const fr=DKB?[]:S.friends.filter(f=>PICK.has(f.id)).slice(0,3),dk=[];for(const s of"♠♥♦♣")for(const r of RK)dk.push(r+s);sh(dk);
- const BN=["Макс","Лиза","Тимур"],bots=Array.from({length:DKB},(_,i)=>{PROF["bot"+i]={id:"bot"+i,name:"Бот "+BN[i],color:[20,150,330][i]};return{id:"bot"+i,name:"Бот "+BN[i],hand:[]}});
- const pl=[{id:"me",name:S.me.name,hand:[]},...fr.map(f=>({id:f.id,name:f.name,hand:[]})),...bots];pl.forEach(p=>p.hand=dk.splice(0,6));
- const tc=dk[dk.length-1],ts=su(tc);let a=0,best=99;pl.forEach((p,i)=>p.hand.forEach(c=>{if(su(c)==ts&&rv(c)<best){best=rv(c);a=i}}));
- const g={dur:1,pl,deck:dk,trump:ts,tc,att:a,table:[],ph:"t",ti:0,pass:[],taking:false,lim:6,st:{},sel:null,over:null,who:a,k:0};g.lim=Math.min(6,pl[dkDef(g)].hand.length);S.cg=g;save();setTimeout(dkStep,300)};
- /* ---------- стикеры, GIF, мемы, кружки ---------- */
-const SK={"Эмоции":"😂 🤣 😍 🥰 😎 🤯 🥳 😭 😡 🤔 🙄 😴 🤡 💀 👻 😈 🫡 🤝 🙏 💪 🔥 💯 ❤️ 💔 ✨ 🎉 👍 👎 👀 🙈".split(" "),"Звери":"🐶 🐱 🐸 🐵 🦄 🐼 🐧 🦊 🐷 🐔 🦆 🐙 🦖 🐢 🐻 🐰 🦁 🐯 🦉 🐝".split(" "),"Еда":"🍕 🍔 🍟 🌮 🍣 🍩 🍺 ☕ 🍷 🍿 🥑 🍉 🍪 🍫 🥂".split(" "),"Мемы":"🗿 🫠 🤌 🥶 🤮 🫣 😮‍💨 🧠 🤏 💅 🤪 😏 🥴 🤓 😤".split(" ")};
-const SKT=["ЖЁСТКО","РЖУ","ОК","БАЗА","ПОГНАЛИ","НЕ ВАЖНО","СПАСИБО","ГДЕ ТЫ?","ПОЗВОНИ","ХАХА","КРИНЖ","ТОП","ПРИВЕТ","ПОКА"];
-const sendRaw=async body=>{const r=await sb.from("messages").insert({room,sender:UID,body}).select().single();if(r.error)return toast("Не отправилось");onMsg(r.data)};
-async function upMedia(blob,ext,type){const path=`${UID}/${Date.now()}.${ext}`,{error}=await sb.storage.from("media").upload(path,blob,{contentType:type});if(error){toast("Не загрузилось: "+error.message);return null}return sb.storage.from("media").getPublicUrl(path).data.publicUrl}
-const _mb2=mBody;mBody=function(m){const b=m.body||"";
- if(b.startsWith("stk:")){const q=b.match(/^stk:(\w):(.*)$/)||[],v=q[2]||"";if(q[1]=="e")return`<div class="stk">${E(v)}</div>`;let h=0;for(const c of v)h=(h*7+c.charCodeAt(0))%360;return`<div class="stt" style="--h:${h}">${E(v)}</div>`}
- if(b.startsWith("gif:")){const u=b.slice(4);return`<img class="mi" src="${E(u)}" data-img="${E(u)}" loading="lazy">`}
- if(b.startsWith("vid:")){const[u,d]=b.slice(4).split("|");return`<div class="vc" data-vc><video src="${E(u)}#t=0.1" playsinline preload="metadata" loop></video><i>▶</i><span>${fmtD(+d||0)}</span></div>`}
- return _mb2(m)};
-let CST="menu",SKP="Эмоции",MM={bg:0,img:null};
-const MBG=[["#8b6cff","#ff5f9e","🗿"],["#0ea5e9","#22c55e","🐸"],["#f59e0b","#ef4444","😎"],["#111827","#6b7280","💀"],["#ec4899","#f97316","🤡"],["#14b8a6","#6366f1","🧠"]];
-function csBody(t){const back='<div class="row sp" style="margin-bottom:12px"><button class="g s" data-cs="menu">‹ Назад</button><button class="g s" data-cs="close">Закрыть</button></div>';
- if(t=="menu")return`<div class="cgr"><div class="ct" data-cs="photo"><b>📷</b>Фото</div><div class="ct" data-cs="stk"><b>😎</b>Стикеры</div><div class="ct" data-cs="gif"><b>🎞️</b>GIF</div><div class="ct" data-cs="meme"><b>🤪</b>Мем</div><div class="ct" data-cs="circle"><b>⭕</b>Кружок</div><div class="ct" data-cs="voice"><b>🎤</b>Голос</div></div>`;
- if(t=="stk")return back+`<div class="sc" style="margin-bottom:10px">${[...Object.keys(SK),"Надписи"].map(k=>`<span class="chip ${SKP==k?"on":""}" data-cs="pack" data-k="${k}">${k}</span>`).join("")}</div>`+(SKP=="Надписи"?`<div class="skt">${SKT.map(x=>{let h=0;for(const c of x)h=(h*7+c.charCodeAt(0))%360;return`<span style="--h:${h}" data-cs="send" data-b="stk:t:${x}">${x}</span>`}).join("")}</div>`:`<div class="skg">${SK[SKP].map(x=>`<span data-cs="send" data-b="stk:e:${x}">${x}</span>`).join("")}</div>`);
- if(t=="gif")return back+(GKEY?`<div class="row"><input id="gq" class="f1" placeholder="Поиск GIF (на английском лучше)"><button data-cs="gs">🔍</button></div><div class="gfg" id="gfg"></div>`:`<div class="m" style="margin-bottom:8px">Вставь ссылку на GIF:</div><div class="row"><input id="gu" class="f1" placeholder="https://…/файл.gif"><button data-cs="gurl">➤</button></div><button class="g" data-cs="gfile" style="width:100%;margin-top:10px">📁 Выбрать GIF с телефона</button><div class="m" style="margin:14px 0 8px;font-size:12px">Чтобы искать GIF прямо здесь, вставь свой бесплатный ключ GIPHY (developers.giphy.com):</div><div class="row"><input id="gk" class="f1" placeholder="Ключ GIPHY"><button class="g" data-cs="gkey">OK</button></div>`);
- if(t=="meme"){const m=MBG[MM.bg];return back+`<canvas id="mcv" width="600" height="600" class="mq2"></canvas><div class="sc" style="margin:10px 0">${MBG.map((x,i)=>`<span class="chip ${MM.bg==i&&!MM.img?"on":""}" data-cs="mbg" data-k="${i}">${x[2]}</span>`).join("")}<span class="chip" data-cs="mpic">📷 Своё фото</span></div><input id="mtop" placeholder="Верхний текст" style="margin-bottom:8px"><input id="mbot" placeholder="Нижний текст" style="margin-bottom:12px"><button data-cs="msend" style="width:100%">Отправить мем</button><input id="mfile" type="file" accept="image/*" hidden>`}return back}
-function csOpen(t){let o=$("#cs");if(!o){o=document.createElement("div");o.id="cs";o.className="csov";document.body.appendChild(o);o.addEventListener("click",csClick)}CST=t;o.innerHTML=`<div class="cspn"><div class="sh" style="margin:0 auto 12px"></div>${csBody(t)}</div>`;o.classList.add("on");if(t=="meme")memeDraw();if(t=="gif"&&GKEY)gifSearch("")}
-const csClose=()=>{const o=$("#cs");if(o)o.classList.remove("on")};
-function memeDraw(){const c=$("#mcv");if(!c)return;const x=c.getContext("2d"),m=MBG[MM.bg];x.clearRect(0,0,600,600);
- if(MM.img){const im=MM.img,z=Math.max(600/im.width,600/im.height);x.drawImage(im,(600-im.width*z)/2,(600-im.height*z)/2,im.width*z,im.height*z)}else{const g=x.createLinearGradient(0,0,600,600);g.addColorStop(0,m[0]);g.addColorStop(1,m[1]);x.fillStyle=g;x.fillRect(0,0,600,600);x.font="320px serif";x.textAlign="center";x.textBaseline="middle";x.fillText(m[2],300,310)}
- const tx=(t,y)=>{t=(t||"").toUpperCase();if(!t)return;let f=64;x.textAlign="center";x.textBaseline="middle";do{x.font=`900 ${f}px Impact,"Arial Black",sans-serif`;f-=3}while(x.measureText(t).width>570&&f>16);x.lineWidth=f/5+3;x.strokeStyle="#000";x.lineJoin="round";x.strokeText(t,300,y);x.fillStyle="#fff";x.fillText(t,300,y)};
- tx($("#mtop")?.value,56);tx($("#mbot")?.value,544)}
-async function gifSearch(q){const g=$("#gfg");if(!g)return;try{const u=q?`https://api.giphy.com/v1/gifs/search?api_key=${GKEY}&q=${encodeURIComponent(q)}&limit=24&lang=ru`:`https://api.giphy.com/v1/gifs/trending?api_key=${GKEY}&limit=24`,r=await(await fetch(u)).json();g.innerHTML=(r.data||[]).map(d=>`<img src="${d.images.fixed_height_small.url}" data-cs="send" data-b="gif:${d.images.fixed_height.url}">`).join("")||'<div class="m">Ничего не нашлось</div>'}catch(e){g.innerHTML='<div class="m">Не получилось загрузить. Проверь ключ</div>'}}
-async function csClick(e){const x=e.target.closest("[data-cs]");if(!x){if(e.target.id=="cs")csClose();return}const d=x.dataset,a=d.cs;
- if(a=="close")return csClose();if(["menu","stk","gif","meme"].includes(a))return csOpen(a);
- if(a=="pack"){SKP=d.k;return csOpen("stk")}
- if(a=="send"){csClose();return sendRaw(d.b)}
- if(a=="photo"){csClose();return $("#pf").click()}
- if(a=="voice"){csClose();return recStart()}
- if(a=="circle"){csClose();return ccStart()}
- if(a=="gs")return gifSearch($("#gq").value.trim());
- if(a=="gurl"){const u=$("#gu").value.trim();if(!/^https?:\/\//.test(u))return toast("Нужна ссылка на GIF");csClose();return sendRaw("gif:"+u)}
- if(a=="gfile"){const i=document.createElement("input");i.type="file";i.accept="image/gif";i.onchange=async()=>{const f=i.files[0];if(!f)return;csClose();toast("Отправляю…");const u=await upMedia(f,"gif","image/gif");if(u)sendRaw("gif:"+u)};return i.click()}
- if(a=="gkey"){const k=$("#gk").value.trim();if(k){GKEY=k;try{localStorage.setItem("gk",k)}catch(e){}csOpen("gif")}}
- if(a=="mbg"){MM.bg=+d.k;MM.img=null;return memeDraw()}
- if(a=="mpic")return $("#mfile").click();
- if(a=="msend"){const c=$("#mcv");c.toBlob(async b=>{csClose();toast("Отправляю…");const u=await upMedia(b,"jpg","image/jpeg");if(u)sendRaw("img:"+u)},"image/jpeg",.85)}}
-document.addEventListener("input",e=>{if(e.target.id=="mtop"||e.target.id=="mbot")memeDraw()});
-document.addEventListener("change",e=>{if(e.target.id=="mfile"&&e.target.files[0]){const im=new Image();im.onload=()=>{MM.img=im;memeDraw()};im.src=URL.createObjectURL(e.target.files[0])}
- else if(e.target.id=="pf"&&e.target.files[0]&&e.target.files[0].type=="image/gif"){e.stopImmediatePropagation();const f=e.target.files[0];e.target.value="";toast("Отправляю…");upMedia(f,"gif","image/gif").then(u=>u&&sendRaw("gif:"+u))}},true);
-document.addEventListener("click",e=>{if(e.target.closest("[data-csopen]")){csOpen("menu");return}
- const v=e.target.closest("[data-vc]");if(v){const vd=v.querySelector("video");if(vd.paused){document.querySelectorAll(".vc video").forEach(x=>{if(x!==vd){x.pause();x.parentElement.classList.remove("pl")}});vd.play();v.classList.add("pl")}else{vd.pause();v.classList.remove("pl")}}});
 /* ---------- служебное ---------- */
 function getLsm2(){return getLsm()}
 const _d11=draw;draw=function(){if(tab!="fam")CO=false;_d11();const L=tab=="rest"&&((GM=="mono"&&RG&&RG.s)||(GM=="bs"&&BS)),G=tab=="rest"&&((GM=="ck"&&S.ck)||(GM=="cards"&&S.cg));
  document.body.classList.toggle("lscfull",!!L);document.body.classList.toggle("gfull",!!(L||G));if(window.ONLINE&&!PVL&&UID){PVL=1;loadPV()}};
 addEventListener("resize",()=>{if(document.body.classList.contains("gfull"))draw()});
+
 /* ===== v11: музыка (SoundCloud / YouTube / Spotify), совместное прослушивание ===== */
 document.head.insertAdjacentHTML("beforeend",`<style>
 .mbtn{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 94px);z-index:50;width:50px;height:50px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;font-size:22px;color:#fff;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 26px -6px color-mix(in srgb,var(--b) 80%,transparent);transition:transform .45s var(--bounce)}
@@ -1115,4 +1049,111 @@ document.addEventListener("click",async e=>{const x=e.target.closest("[data-mu]"
  if(d.mu=="join"){const v=MU.inv.splice(+d.k,1)[0];if(v){mJoin(v.room);if(v.p)await mLoad(v.p)}}
  if(d.mu=="leave")mLeave()});
 const _d12=draw;draw=function(){_d12();if(window.ONLINE)ensureMusic()};
+
+/* ===== v12: боты в дураке, стикеры/GIF/мемы/кружки, группы ===== */
+document.head.insertAdjacentHTML("beforeend",`<style>
+.stk{font-size:76px;line-height:1.05;animation:stk .6s var(--bounce) both;filter:drop-shadow(0 6px 8px #0004)}@keyframes stk{from{transform:scale(.2) rotate(-25deg);opacity:0}}
+.stt{font-weight:900;font-size:24px;letter-spacing:-.5px;padding:10px 16px;border-radius:18px;color:#fff;background:linear-gradient(135deg,hsl(var(--h),85%,58%),hsl(calc(var(--h) + 45),85%,48%));transform:rotate(-4deg);box-shadow:0 10px 20px -8px hsl(var(--h),85%,40%);animation:stk .6s var(--bounce) both}
+.bb.nb{background:none!important;padding:0 2px}.bb.nb em{color:var(--m)}.bb.nb small{opacity:.8}
+.vc{position:relative;width:200px;height:200px;border-radius:50%;overflow:hidden;cursor:pointer;background:#000;box-shadow:0 10px 24px -10px #000a;animation:stk .5s var(--bounce) both}.vc video{width:100%;height:100%;object-fit:cover;display:block}
+.vc i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:38px;color:#fff;background:#0003;transition:opacity .2s}.vc.pl i{opacity:0}.vc span{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:11px;background:#0008;color:#fff;padding:2px 8px;border-radius:10px}
+.csov{position:fixed;inset:0;z-index:72;background:#0008;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}.csov.on{opacity:1;pointer-events:auto}
+.cspn{width:100%;max-width:520px;margin:0 auto;border-radius:32px 32px 0 0;background:color-mix(in srgb,var(--c) 96%,transparent);backdrop-filter:blur(24px);padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:80dvh;overflow:auto;animation:up .45s var(--sp) both}
+.cgr{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ct{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 4px;border-radius:22px;font-size:13px;font-weight:600;background:var(--c2);cursor:pointer;transition:transform .4s var(--bounce)}.ct:active{transform:scale(.92)}.ct b{font-size:32px;font-weight:400}
+.skg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.skg span{font-size:38px;text-align:center;padding:6px 0;border-radius:14px;cursor:pointer;transition:transform .3s var(--bounce)}.skg span:active{transform:scale(1.3)}
+.skt{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.skt span{text-align:center;font-weight:800;padding:12px 6px;border-radius:14px;color:#fff;background:linear-gradient(135deg,hsl(var(--h),85%,58%),hsl(calc(var(--h) + 45),85%,48%));cursor:pointer}
+.gfg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.gfg img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;cursor:pointer;background:var(--c2)}
+.ccov{position:fixed;inset:0;z-index:90;background:#000d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;animation:fade .25s both}
+.ccv{position:relative;width:min(72vw,300px);aspect-ratio:1}.ccv video{width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scaleX(-1)}.ccv svg{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);transform:rotate(-90deg)}.ccv circle{fill:none;stroke-width:5;stroke-linecap:round}
+.mq2{width:100%;border-radius:16px;background:#222}
+</style>`);
+let DKB=0,DKN=2,GRP=[],GL=0,GERR=0,GKEY="";try{GKEY=localStorage.getItem("gk")||""}catch(e){}
+/* ---------- карты с ботами ---------- */
+dkNew=function(){const fr=DKB?[]:S.friends.filter(f=>PICK.has(f.id)).slice(0,3),dk=[];for(const s of"♠♥♦♣")for(const r of RK)dk.push(r+s);sh(dk);
+ const BN=["Макс","Лиза","Тимур"],bots=Array.from({length:DKB},(_,i)=>{PROF["bot"+i]={id:"bot"+i,name:"Бот "+BN[i],color:[20,150,330][i]};return{id:"bot"+i,name:"Бот "+BN[i],hand:[]}});
+ const pl=[{id:"me",name:S.me.name,hand:[]},...fr.map(f=>({id:f.id,name:f.name,hand:[]})),...bots];pl.forEach(p=>p.hand=dk.splice(0,6));
+ const tc=dk[dk.length-1],ts=su(tc);let a=0,best=99;pl.forEach((p,i)=>p.hand.forEach(c=>{if(su(c)==ts&&rv(c)<best){best=rv(c);a=i}}));
+ const g={dur:1,pl,deck:dk,trump:ts,tc,att:a,table:[],ph:"t",ti:0,pass:[],taking:false,lim:6,st:{},sel:null,over:null,who:a,k:0};g.lim=Math.min(6,pl[dkDef(g)].hand.length);S.cg=g;save();setTimeout(dkStep,300)};
+/* ---------- стикеры, GIF, мемы, кружки ---------- */
+const SK={"Эмоции":"😂 🤣 😍 🥰 😎 🤯 🥳 😭 😡 🤔 🙄 😴 🤡 💀 👻 😈 🫡 🤝 🙏 💪 🔥 💯 ❤️ 💔 ✨ 🎉 👍 👎 👀 🙈".split(" "),"Звери":"🐶 🐱 🐸 🐵 🦄 🐼 🐧 🦊 🐷 🐔 🦆 🐙 🦖 🐢 🐻 🐰 🦁 🐯 🦉 🐝".split(" "),"Еда":"🍕 🍔 🍟 🌮 🍣 🍩 🍺 ☕ 🍷 🍿 🥑 🍉 🍪 🍫 🥂".split(" "),"Мемы":"🗿 🫠 🤌 🥶 🤮 🫣 😮‍💨 🧠 🤏 💅 🤪 😏 🥴 🤓 😤".split(" ")};
+const SKT=["ЖЁСТКО","РЖУ","ОК","БАЗА","ПОГНАЛИ","НЕ ВАЖНО","СПАСИБО","ГДЕ ТЫ?","ПОЗВОНИ","ХАХА","КРИНЖ","ТОП","ПРИВЕТ","ПОКА"];
+const sendRaw=async body=>{const r=await sb.from("messages").insert({room,sender:UID,body}).select().single();if(r.error)return toast("Не отправилось");onMsg(r.data)};
+async function upMedia(blob,ext,type){const path=`${UID}/${Date.now()}.${ext}`,{error}=await sb.storage.from("media").upload(path,blob,{contentType:type});if(error){toast("Не загрузилось: "+error.message);return null}return sb.storage.from("media").getPublicUrl(path).data.publicUrl}
+const _mb2=mBody;mBody=function(m){const b=m.body||"";
+ if(b.startsWith("stk:")){const q=b.match(/^stk:(\w):(.*)$/)||[],v=q[2]||"";if(q[1]=="e")return`<div class="stk">${E(v)}</div>`;let h=0;for(const c of v)h=(h*7+c.charCodeAt(0))%360;return`<div class="stt" style="--h:${h}">${E(v)}</div>`}
+ if(b.startsWith("gif:")){const u=b.slice(4);return`<img class="mi" src="${E(u)}" data-img="${E(u)}" loading="lazy">`}
+ if(b.startsWith("vid:")){const[u,d]=b.slice(4).split("|");return`<div class="vc" data-vc><video src="${E(u)}#t=0.1" playsinline preload="metadata" loop></video><i>▶</i><span>${fmtD(+d||0)}</span></div>`}
+ return _mb2(m)};
+let CST="menu",SKP="Эмоции",MM={bg:0,img:null};
+const MBG=[["#8b6cff","#ff5f9e","🗿"],["#0ea5e9","#22c55e","🐸"],["#f59e0b","#ef4444","😎"],["#111827","#6b7280","💀"],["#ec4899","#f97316","🤡"],["#14b8a6","#6366f1","🧠"]];
+function csBody(t){const back='<div class="row sp" style="margin-bottom:12px"><button class="g s" data-cs="menu">‹ Назад</button><button class="g s" data-cs="close">Закрыть</button></div>';
+ if(t=="menu")return`<div class="cgr"><div class="ct" data-cs="photo"><b>📷</b>Фото</div><div class="ct" data-cs="stk"><b>😎</b>Стикеры</div><div class="ct" data-cs="gif"><b>🎞️</b>GIF</div><div class="ct" data-cs="meme"><b>🤪</b>Мем</div><div class="ct" data-cs="circle"><b>⭕</b>Кружок</div><div class="ct" data-cs="voice"><b>🎤</b>Голос</div></div>`;
+ if(t=="stk")return back+`<div class="sc" style="margin-bottom:10px">${[...Object.keys(SK),"Надписи"].map(k=>`<span class="chip ${SKP==k?"on":""}" data-cs="pack" data-k="${k}">${k}</span>`).join("")}</div>`+(SKP=="Надписи"?`<div class="skt">${SKT.map(x=>{let h=0;for(const c of x)h=(h*7+c.charCodeAt(0))%360;return`<span style="--h:${h}" data-cs="send" data-b="stk:t:${x}">${x}</span>`}).join("")}</div>`:`<div class="skg">${SK[SKP].map(x=>`<span data-cs="send" data-b="stk:e:${x}">${x}</span>`).join("")}</div>`);
+ if(t=="gif")return back+(GKEY?`<div class="row"><input id="gq" class="f1" placeholder="Поиск GIF (на английском лучше)"><button data-cs="gs">🔍</button></div><div class="gfg" id="gfg"></div>`:`<div class="m" style="margin-bottom:8px">Вставь ссылку на GIF:</div><div class="row"><input id="gu" class="f1" placeholder="https://…/файл.gif"><button data-cs="gurl">➤</button></div><button class="g" data-cs="gfile" style="width:100%;margin-top:10px">📁 Выбрать GIF с телефона</button><div class="m" style="margin:14px 0 8px;font-size:12px">Чтобы искать GIF прямо здесь, вставь свой бесплатный ключ GIPHY (developers.giphy.com):</div><div class="row"><input id="gk" class="f1" placeholder="Ключ GIPHY"><button class="g" data-cs="gkey">OK</button></div>`);
+ if(t=="meme"){const m=MBG[MM.bg];return back+`<canvas id="mcv" width="600" height="600" class="mq2"></canvas><div class="sc" style="margin:10px 0">${MBG.map((x,i)=>`<span class="chip ${MM.bg==i&&!MM.img?"on":""}" data-cs="mbg" data-k="${i}">${x[2]}</span>`).join("")}<span class="chip" data-cs="mpic">📷 Своё фото</span></div><input id="mtop" placeholder="Верхний текст" style="margin-bottom:8px"><input id="mbot" placeholder="Нижний текст" style="margin-bottom:12px"><button data-cs="msend" style="width:100%">Отправить мем</button><input id="mfile" type="file" accept="image/*" hidden>`}return back}
+function csOpen(t){let o=$("#cs");if(!o){o=document.createElement("div");o.id="cs";o.className="csov";document.body.appendChild(o);o.addEventListener("click",csClick)}CST=t;o.innerHTML=`<div class="cspn"><div class="sh" style="margin:0 auto 12px"></div>${csBody(t)}</div>`;o.classList.add("on");if(t=="meme")memeDraw();if(t=="gif"&&GKEY)gifSearch("")}
+const csClose=()=>{const o=$("#cs");if(o)o.classList.remove("on")};
+function memeDraw(){const c=$("#mcv");if(!c)return;const x=c.getContext("2d"),m=MBG[MM.bg];x.clearRect(0,0,600,600);
+ if(MM.img){const im=MM.img,z=Math.max(600/im.width,600/im.height);x.drawImage(im,(600-im.width*z)/2,(600-im.height*z)/2,im.width*z,im.height*z)}else{const g=x.createLinearGradient(0,0,600,600);g.addColorStop(0,m[0]);g.addColorStop(1,m[1]);x.fillStyle=g;x.fillRect(0,0,600,600);x.font="320px serif";x.textAlign="center";x.textBaseline="middle";x.fillText(m[2],300,310)}
+ const tx=(t,y)=>{t=(t||"").toUpperCase();if(!t)return;let f=64;x.textAlign="center";x.textBaseline="middle";do{x.font=`900 ${f}px Impact,"Arial Black",sans-serif`;f-=3}while(x.measureText(t).width>570&&f>16);x.lineWidth=f/5+3;x.strokeStyle="#000";x.lineJoin="round";x.strokeText(t,300,y);x.fillStyle="#fff";x.fillText(t,300,y)};
+ tx($("#mtop")?.value,56);tx($("#mbot")?.value,544)}
+async function gifSearch(q){const g=$("#gfg");if(!g)return;try{const u=q?`https://api.giphy.com/v1/gifs/search?api_key=${GKEY}&q=${encodeURIComponent(q)}&limit=24&lang=ru`:`https://api.giphy.com/v1/gifs/trending?api_key=${GKEY}&limit=24`,r=await(await fetch(u)).json();g.innerHTML=(r.data||[]).map(d=>`<img src="${d.images.fixed_height_small.url}" data-cs="send" data-b="gif:${d.images.fixed_height.url}">`).join("")||'<div class="m">Ничего не нашлось</div>'}catch(e){g.innerHTML='<div class="m">Не получилось загрузить. Проверь ключ</div>'}}
+async function csClick(e){const x=e.target.closest("[data-cs]");if(!x){if(e.target.id=="cs")csClose();return}const d=x.dataset,a=d.cs;
+ if(a=="close")return csClose();if(["menu","stk","gif","meme"].includes(a))return csOpen(a);
+ if(a=="pack"){SKP=d.k;return csOpen("stk")}
+ if(a=="send"){csClose();return sendRaw(d.b)}
+ if(a=="photo"){csClose();return $("#pf").click()}
+ if(a=="voice"){csClose();return recStart()}
+ if(a=="circle"){csClose();return ccStart()}
+ if(a=="gs")return gifSearch($("#gq").value.trim());
+ if(a=="gurl"){const u=$("#gu").value.trim();if(!/^https?:\/\//.test(u))return toast("Нужна ссылка на GIF");csClose();return sendRaw("gif:"+u)}
+ if(a=="gfile"){const i=document.createElement("input");i.type="file";i.accept="image/gif";i.onchange=async()=>{const f=i.files[0];if(!f)return;csClose();toast("Отправляю…");const u=await upMedia(f,"gif","image/gif");if(u)sendRaw("gif:"+u)};return i.click()}
+ if(a=="gkey"){const k=$("#gk").value.trim();if(k){GKEY=k;try{localStorage.setItem("gk",k)}catch(e){}csOpen("gif")}}
+ if(a=="mbg"){MM.bg=+d.k;MM.img=null;return memeDraw()}
+ if(a=="mpic")return $("#mfile").click();
+ if(a=="msend"){const c=$("#mcv");c.toBlob(async b=>{csClose();toast("Отправляю…");const u=await upMedia(b,"jpg","image/jpeg");if(u)sendRaw("img:"+u)},"image/jpeg",.85)}}
+document.addEventListener("input",e=>{if(e.target.id=="mtop"||e.target.id=="mbot")memeDraw()});
+document.addEventListener("change",e=>{if(e.target.id=="mfile"&&e.target.files[0]){const im=new Image();im.onload=()=>{MM.img=im;memeDraw()};im.src=URL.createObjectURL(e.target.files[0])}
+ else if(e.target.id=="pf"&&e.target.files[0]&&e.target.files[0].type=="image/gif"){e.stopImmediatePropagation();const f=e.target.files[0];e.target.value="";toast("Отправляю…");upMedia(f,"gif","image/gif").then(u=>u&&sendRaw("gif:"+u))}},true);
+document.addEventListener("click",e=>{if(e.target.closest("[data-csopen]")){csOpen("menu");return}
+ const v=e.target.closest("[data-vc]");if(v){const vd=v.querySelector("video");if(vd.paused){document.querySelectorAll(".vc video").forEach(x=>{if(x!==vd){x.pause();x.parentElement.classList.remove("pl")}});vd.play();v.classList.add("pl")}else{vd.pause();v.classList.remove("pl")}}});
+/* кружки */
+let CC=null,CCF="user";
+async function ccStart(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:CCF,width:{ideal:480},height:{ideal:480}},audio:true}),mt=["video/mp4","video/webm;codecs=vp9,opus","video/webm"].find(t=>MediaRecorder.isTypeSupported(t))||"",mr=new MediaRecorder(st,mt?{mimeType:mt}:{}),ch=[];
+ mr.ondataavailable=e=>e.data.size&&ch.push(e.data);const o=document.createElement("div");o.className="ccov";o.id="cc";o.innerHTML=`<div class="ccv"><video id="ccp" autoplay muted playsinline></video><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="#ffffff30"/><circle id="ccr" cx="50" cy="50" r="48" stroke="#ef4444" stroke-dasharray="301.6" stroke-dashoffset="301.6"/></svg></div><div id="cct" style="color:#fff;font-weight:700;font-size:18px">0:00</div><div class="row" style="gap:14px"><button class="g" data-cc="x" style="width:56px;height:56px;border-radius:50%">✕</button><button data-cc="send" style="height:56px;padding:0 28px;border-radius:28px">➤ Отправить</button><button class="g" data-cc="flip" style="width:56px;height:56px;border-radius:50%">🔄</button></div>`;
+ document.body.appendChild(o);$("#ccp").srcObject=st;CC={mr,st,ch,t0:Date.now(),mt:(mr.mimeType||mt).split(";")[0],send:false};CC.tm=setInterval(()=>{const s=(Date.now()-CC.t0)/1e3;$("#cct").textContent=fmtD(s|0);$("#ccr").style.strokeDashoffset=301.6*(1-Math.min(1,s/30));if(s>=30)ccStop(true)},200);mr.onstop=ccDone;mr.start()}catch(e){toast("Нет доступа к камере или микрофону")}}
+function ccStop(send){if(!CC)return;CC.send=send;clearInterval(CC.tm);if(CC.mr.state!="inactive")CC.mr.stop();CC.st.getTracks().forEach(t=>t.stop());$("#cc")?.remove()}
+async function ccDone(){const c=CC;CC=null;if(!c||!c.send)return;const s=Math.round((Date.now()-c.t0)/1e3);if(s<1)return toast("Слишком коротко");toast("Отправляю кружок…");const u=await upMedia(new Blob(c.ch,{type:c.mt}),c.mt.includes("mp4")?"mp4":"webm",c.mt);if(u)sendRaw("vid:"+u+"|"+s)}
+document.addEventListener("click",e=>{const x=e.target.closest("[data-cc]");if(!x)return;const a=x.dataset.cc;if(a=="x")ccStop(false);if(a=="send")ccStop(true);if(a=="flip"){ccStop(false);CCF=CCF=="user"?"environment":"user";setTimeout(ccStart,300)}});
+/* ---------- группы ---------- */
+const gav=(g,z)=>`<div style="width:${z}px;height:${z}px;border-radius:${Math.round(z*.36)}px;flex:none;display:grid;place-items:center;font-size:${Math.round(z*.45)}px;color:#fff;background:${g.avatar?`url(${g.avatar}) center/cover`:"linear-gradient(135deg,#8b6cff,#ff5f9e)"}">${g.avatar?"":"👥"}</div>`;
+const fileAv=(f,z=160)=>new Promise(r=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const c=document.createElement("canvas"),s=Math.min(im.width,im.height);c.width=c.height=z;c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,z,z);URL.revokeObjectURL(u);r(c.toDataURL("image/jpeg",.8))};im.src=u});
+async function loadGroups(){const{data:gm,error}=await sb.from("group_members").select("group_id,user_id");if(error){GERR=1;GRP=[];return}GERR=0;const ids=[...new Set((gm||[]).map(x=>x.group_id))];if(!ids.length){GRP=[];if(tab=="fam")draw();return}
+ const{data:gs}=await sb.from("groups").select("*").in("id",ids),need=[...new Set(gm.map(x=>x.user_id))].filter(i=>!PROF[i]);
+ if(need.length){const{data:pr}=await sb.from("profiles").select("id,name,color,avatar,status,txt").in("id",need);(pr||[]).forEach(p=>PROF[p.id]=p)}
+ GRP=(gs||[]).map(g=>({...g,members:gm.filter(x=>x.group_id==g.id).map(x=>x.user_id)}));if(tab=="fam")draw()}
+function gSheet(gid){const g=gid?GRP.find(x=>x.id==gid):null,own=g&&g.owner==UID,st={name:g?g.name:"",avatar:g?g.avatar:null,sel:new Set()},d=document.createElement("div");d.className="csov on";document.body.appendChild(d);
+ const pf=id=>id==UID?S.me:PROF[id]||F(id);
+ const render=()=>{d.innerHTML=`<div class="cspn"><div class="sh" style="margin:0 auto 12px"></div><div style="text-align:center"><div style="display:flex;justify-content:center;margin-bottom:10px" data-g2="av">${gav({avatar:st.avatar},88)}</div><div class="m" style="margin-bottom:10px">Нажми на значок, чтобы выбрать аватарку</div><input id="gnm" value="${E(st.name)}" placeholder="Название группы" maxlength="30" style="text-align:center;font-size:18px;font-weight:700"><input id="gaf" type="file" accept="image/*" hidden></div>
+  ${g?`<div class="m" style="margin:16px 0 8px">Участники (${g.members.length})</div>${g.members.map(u=>`<div class="row sp" style="margin-bottom:8px"><span class="row">${mini(pf(u),38)}<b>${E(pf(u).name)}${u==g.owner?" 👑":""}</b></span>${own&&u!=UID?`<button class="g s" data-g2="rm" data-k="${u}">Убрать</button>`:""}</div>`).join("")}`:""}
+  ${!g||own?`<div class="m" style="margin:14px 0 8px">${g?"Добавить друзей":"Кого добавить в группу"}:</div><div class="sc">${S.friends.filter(f=>!g||!g.members.includes(f.id)).map(f=>`<span class="chip ${st.sel.has(f.id)?"on":""}" data-g2="pick" data-k="${f.id}">${mini(f,22)}${E(f.name)}</span>`).join("")||'<span class="m">Все друзья уже в группе</span>'}</div>`:""}
+  <div class="row" style="margin-top:18px"><button class="f1" data-g2="save">${g?"Сохранить":"Создать группу"}</button><button class="g" data-g2="x">Закрыть</button></div>
+  ${g?`<button class="g s" data-g2="leave" style="margin-top:12px;color:var(--r)">${own?"Удалить группу":"Выйти из группы"}</button>`:""}</div>`};
+ render();
+ d.addEventListener("input",e=>{if(e.target.id=="gnm")st.name=e.target.value});
+ d.addEventListener("change",async e=>{if(e.target.id=="gaf"&&e.target.files[0]){st.avatar=await fileAv(e.target.files[0]);render()}});
+ d.addEventListener("click",async e=>{if(e.target==d)return d.remove();const x=e.target.closest("[data-g2]");if(!x)return;const a=x.dataset.g2;
+  if(a=="x")return d.remove();if(a=="av")return d.querySelector("#gaf").click();
+  if(a=="pick"){st.sel.has(x.dataset.k)?st.sel.delete(x.dataset.k):st.sel.add(x.dataset.k);return render()}
+  if(a=="rm"){await sb.from("group_members").delete().eq("group_id",g.id).eq("user_id",x.dataset.k);await loadGroups();return d.remove()}
+  if(a=="leave"){if(!confirm(own?"Удалить группу для всех?":"Выйти из группы?"))return;if(own)await sb.from("groups").delete().eq("id",g.id);else await sb.from("group_members").delete().eq("group_id",g.id).eq("user_id",UID);CO=false;await loadGroups();d.remove();draw();return}
+  if(a=="save"){const name=st.name.trim();if(!name)return toast("Назови группу");
+   if(g){await sb.from("groups").update({name,avatar:st.avatar}).eq("id",g.id);if(st.sel.size){await sb.from("group_members").insert([...st.sel].map(u=>({group_id:g.id,user_id:u})));sb.from("notifications").insert([...st.sel].map(u=>({user_id:u,kind:"group",data:{text:S.me.name+" добавил(а) тебя в группу «"+name+"»",from:UID}}))).then(()=>{})}await loadGroups();toast("Сохранено");return d.remove()}
+   const r=await sb.from("groups").insert({name,avatar:st.avatar,owner:UID}).select().single();if(r.error)return toast("Группы не настроены. Выполни SQL из инструкции");
+   await sb.from("group_members").insert([UID,...st.sel].map(u=>({group_id:r.data.id,user_id:u})));if(st.sel.size)sb.from("notifications").insert([...st.sel].map(u=>({user_id:u,kind:"group",data:{text:S.me.name+" добавил(а) тебя в группу «"+name+"»",from:UID}}))).then(()=>{});
+   await loadGroups();d.remove();tab="fam";room="g:"+r.data.id;CO=true;draw()}})}
+document.addEventListener("click",e=>{const x=e.target.closest("[data-g]");if(!x)return;if(x.dataset.g=="new")gSheet();if(x.dataset.g=="set"){const gid=+room.slice(2);if(GRP.find(g=>g.id==gid))gSheet(gid)}});
+const _d13=draw;draw=function(){_d13();if(window.ONLINE&&!GL&&UID){GL=1;loadGroups();sb.channel("grp").on("postgres_changes",{event:"*",schema:"public",table:"group_members"},()=>loadGroups()).on("postgres_changes",{event:"*",schema:"public",table:"groups"},()=>loadGroups()).subscribe()}};
+/* починка: у подкидывающих кончились карты — раунд завершается сам */
+const _dks=dkStep;dkStep=function(){const g=S.cg;if(g&&g.dur&&!g.over&&g.ph=="t"&&!dkT(g).length){dkEnd(!!g.taking);return}_dks()};
 </script></body></html>
