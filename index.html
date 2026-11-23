@@ -231,7 +231,7 @@ function cab(){const m=S.me,r=calcR(),c=r.c;
  return`<div class="card" style="text-align:center"><div class="av big" style="background:${m.avatar?`url(${m.avatar}) center/cover`:`linear-gradient(135deg,hsl(${m.color},80%,60%),hsl(${m.color+50},80%,55%))`}">${m.avatar?"":E((m.name||"?")[0].toUpperCase())}<label for="af">${ic("plus",18)}</label><input id="af" type="file" accept="image/*" hidden></div>
  <input class="nmi" data-p="name" value="${E(m.name)}" maxlength="20"><div class="m" style="margin-bottom:12px">${ST[m.status][0]}</div>
  <div class="chips" style="justify-content:center">${Object.entries(ST).map(([k,v])=>`<span class="chip ${m.status==k?"on":""}" data-a="st" data-k="${k}">${ic(v[2],16)}${v[0]}</span>`).join("")}</div>
- <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"><div class="m" style="margin-top:14px">${m.code?"Мой ID: <b>"+E(m.code)+"</b>":""}</div><button class="s" data-p="pn" style="margin-top:14px;width:100%">🔔 Включить уведомления на телефон</button><button class="g s" data-p="out" style="margin-top:10px">Выйти</button></div>
+ <input data-p="txt" value="${E(m.txt)}" placeholder="Свой статус: хочу кофе ☕" style="margin-top:14px;text-align:center" maxlength="60"><div class="m" style="margin-top:14px">${m.code?"Мой ID: <b>"+E(m.code)+"</b>":""}</div><button class="s" data-p="pn" style="margin-top:14px;width:100%">🔔 Включить уведомления на телефон</button><div id="pst" class="m" style="margin-top:8px;font-size:12px"></div><button class="g s" data-p="pt" style="margin-top:8px;width:100%">Отправить тестовое уведомление</button><button class="g s" data-p="out" style="margin-top:10px">Выйти</button></div>
  <div class="card"><h3>${ic("coin",16)} Калькулятор расходов</h3>
  <div class="chips" style="margin-bottom:12px">${CUR.map(x=>`<span class="chip ${c.cur==x?"on":""}" data-p="cur" data-k="${x}">${x}</span>`).join("")}</div>
  <div class="m">Зарплата</div><input data-p="sal" type="number" inputmode="decimal" placeholder="0" value="${c.sal||""}" style="margin:6px 0 12px;font-size:20px;font-weight:700">
@@ -381,7 +381,7 @@ updMsgs=function(){const el=$("#ml");if(!el)return;const ms=S.msgs[room]||[];el.
 const _bs=botSay;botSay=function(r){if(!window.ONLINE)_bs(r)};
 const _si=sendInvite;sendInvite=function(kind){if(!window.ONLINE)return _si(kind);S.invites.unshift({id:Date.now(),kind,from:"me",ts:Date.now(),r:{}});if(kind!="smoke")S.me.status=kind;save();draw();
  if(!S.friends.length)return toast("Сначала добавь друзей");
- sb.from("notifications").insert(S.friends.map(f=>({user_id:f.id,kind:"invite",data:{kind,from:UID,text:S.me.name+" зовёт: "+KIND[kind][0]}}))).then(()=>{});toast("Позвал друзей: "+S.friends.length)};
+ sb.from("notifications").insert(S.friends.map(f=>({user_id:f.id,kind:"invite",data:{kind,from:UID,text:S.me.name+" зовёт: "+KIND[kind][0]+" через 15 минут"}}))).then(()=>{});toast("Позвал друзей: "+S.friends.length)};
 const _h=home;home=function(){const q=REQ.map(r=>`<div class="card" style="border-color:var(--a)"><div class="row">${av(r)}<div class="f1"><b>${E(r.name)}</b><div class="m">хочет дружить</div></div><button class="s" data-p="fa" data-k="${r.fid}">${ic("check",15)}</button><button class="g s" data-p="fd" data-k="${r.fid}">${ic("x",15)}</button></div></div>`).join("");return q+_h()};
 const _d2=draw;draw=function(){_d2();if(!window.ONLINE||!S.me.name)return;if(tab=="fam"){if(!LOADED[room]){LOADED[room]=1;loadMsgs(room)}if(room!="all"){const fs=$("#fs");if(fs){const r=fs.parentElement;r.previousElementSibling?.remove();r.remove()}}}};
 setInterval(async()=>{if(!UID)return;const m=S.me,o={name:m.name,color:m.color,avatar:m.avatar||null,status:m.status,txt:m.txt},j=JSON.stringify(o);if(j==lastP)return;const{error}=await sb.from("profiles").update(o).eq("id",UID);if(!error){lastP=j;const k=m.status+"|"+m.txt;if(k!=lastS){if(lastS)notifyFriends("status",S.me.name+": "+(m.txt||ST[m.status][0]));lastS=k}}},2500);
@@ -1156,4 +1156,15 @@ document.addEventListener("click",e=>{const x=e.target.closest("[data-g]");if(!x
 const _d13=draw;draw=function(){_d13();if(window.ONLINE&&!GL&&UID){GL=1;loadGroups();sb.channel("grp").on("postgres_changes",{event:"*",schema:"public",table:"group_members"},()=>loadGroups()).on("postgres_changes",{event:"*",schema:"public",table:"groups"},()=>loadGroups()).subscribe()}};
 /* починка: у подкидывающих кончились карты — раунд завершается сам */
 const _dks=dkStep;dkStep=function(){const g=S.cg;if(g&&g.dur&&!g.over&&g.ph=="t"&&!dkT(g).length){dkEnd(!!g.taking);return}_dks()};
+
+/* ===== v13: статус пушей, тест, самолечение подписки ===== */
+async function pushStatus(){const e=$("#pst");if(!e)return;let t;
+ if(!("serviceWorker" in navigator)||!("PushManager" in window)||!window.Notification)t=/iPhone|iPad/.test(navigator.userAgent)?"⚠️ На iPhone: «Поделиться» → «На экран Домой», потом открой «Свои» с иконки":"⚠️ Этот браузер не поддерживает пуши";
+ else if(Notification.permission=="denied")t="⛔ Уведомления запрещены: Настройки → Уведомления → Свои";
+ else{const r=await navigator.serviceWorker.ready.catch(()=>null),s=r&&await r.pushManager.getSubscription();
+  if(s){t="✅ Уведомления на экран блокировки включены";SUBBED=true;sb.from("push_subs").upsert({endpoint:s.endpoint,user_id:UID,sub:s.toJSON()}).then(x=>{if(x&&x.error)$("#pst")&&($("#pst").textContent="⚠️ Подписка не сохранилась на сервере: "+x.error.message)})}else t="Не включены — нажми кнопку выше"}
+ e.textContent=t}
+document.addEventListener("click",e=>{if(!window.ONLINE||!e.target.closest("[data-p=pt]"))return;ding();
+ sb.from("notifications").insert({user_id:UID,kind:"test",data:{text:"Проверка связи: если видишь это на экране блокировки — всё работает 🎉",from:UID}}).then(r=>toast(r.error?"Не отправилось: "+r.error.message:"Тест отправлен. Заблокируй телефон и подожди 5–10 секунд"))});
+const _d14=draw;draw=function(){_d14();if(tab=="me"&&window.ONLINE)setTimeout(pushStatus,50)};
 </script></body></html>
